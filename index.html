@@ -1,0 +1,1575 @@
+<!DOCTYPE html>
+<html lang="en" class="dark-mode">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Oasis-trips — Visual Journey Planner</title>
+
+  <!-- High-Speed DNS Prefetch & Zero-Key CDNs -->
+  <link rel="dns-prefetch" href="//cartocdn.com">
+  <link rel="dns-prefetch" href="//server.arcgisonline.com">
+  <link rel="dns-prefetch" href="//nominatim.openstreetmap.org">
+  <link rel="dns-prefetch" href="//photon.komoot.io">
+  <link rel="preconnect" href="https://unpkg.com" crossorigin>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Leaflet CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    :root {
+      --brand-cyan: #00f2fe;
+      --brand-blue: #007aff;
+      --glass-base: rgba(255, 255, 255, 0.15);
+      /* Crystal clear transparency */
+      --glass-gradient: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.05) 100%);
+      --glass-border: rgba(255, 255, 255, 0.4);
+      --glass-inner-light: inset 0 1px 1px rgba(255, 255, 255, 0.8), inset 0 -1px 2px rgba(0, 0, 0, 0.05);
+      --glass-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.3);
+      --text-main: #111827;
+      --text-muted: #6b7280;
+    }
+
+    .dark-mode {
+      --brand-cyan: #00f2fe;
+      --brand-blue: #2997ff;
+      --glass-base: rgba(12, 16, 28, 0.25);
+      /* Crystal clear transparency */
+      --glass-gradient: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.01) 100%);
+      --glass-border: rgba(255, 255, 255, 0.12);
+      --glass-inner-light: inset 0 1px 1px rgba(255, 255, 255, 0.2), inset 0 -1px 1px rgba(0, 0, 0, 0.3);
+      --glass-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+    }
+
+    * {
+      scrollbar-width: none !important;
+      -ms-overflow-style: none !important;
+      -webkit-tap-highlight-color: transparent;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", "Segoe UI", Roboto, sans-serif;
+    }
+
+    *::-webkit-scrollbar {
+      display: none !important;
+    }
+
+    body {
+      background-color: #05070e;
+      color: var(--text-main);
+      -webkit-font-smoothing: antialiased;
+      overflow: hidden;
+      width: 100vw;
+      height: 100dvh;
+    }
+
+    /* Crystal Clear Glassmorphism */
+    .liquid-glass {
+      background: var(--glass-base);
+      background-image: var(--glass-gradient);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      box-shadow: var(--glass-shadow), var(--glass-inner-light);
+      border: 1px solid var(--glass-border);
+      position: relative;
+    }
+
+    /* Specular highlight rim for 3D glassy edge */
+    .liquid-glass::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.0) 30%, rgba(0, 242, 254, 0.1) 100%);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    /* Glass Input Boxes */
+    .glass-input-box {
+      background: rgba(120, 120, 128, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .dark-mode .glass-input-box {
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .glass-input-box:focus-within {
+      border-color: rgba(41, 151, 255, 0.5);
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1), 0 0 0 3px rgba(41, 151, 255, 0.2);
+      background: rgba(120, 120, 128, 0.14);
+    }
+
+    /* Liquid Button */
+    .liquid-button {
+      background: linear-gradient(135deg, rgba(41, 151, 255, 0.85) 0%, rgba(0, 242, 254, 0.85) 100%);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 8px 25px -5px rgba(0, 122, 255, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .liquid-button:hover {
+      box-shadow: 0 12px 30px -5px rgba(0, 122, 255, 0.6), inset 0 1px 2px rgba(255, 255, 255, 0.6);
+      transform: translateY(-2px) scale(1.01);
+      background: linear-gradient(135deg, rgba(41, 151, 255, 0.95) 0%, rgba(0, 242, 254, 0.95) 100%);
+    }
+
+    /* Glass Toggles (Checkboxes) */
+    .glass-toggle {
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    /* Multi-layered Morphing Background Blobs */
+    .liquid-blob {
+      position: fixed;
+      border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 10;
+      mix-blend-mode: screen;
+      opacity: 0.7;
+    }
+
+    .dark-mode .liquid-blob {
+      mix-blend-mode: color-dodge;
+      opacity: 0.45;
+    }
+
+    @keyframes morph-blob-1 {
+      0% {
+        border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+        transform: translate(0, 0) rotate(0deg) scale(1);
+      }
+
+      50% {
+        border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+        transform: translate(30px, -40px) rotate(180deg) scale(1.1);
+      }
+
+      100% {
+        border-radius: 50% 50% 30% 70% / 60% 40% 60% 40%;
+        transform: translate(-20px, 30px) rotate(360deg) scale(0.95);
+      }
+    }
+
+    .blob-1 {
+      animation: morph-blob-1 18s ease-in-out infinite alternate;
+    }
+
+    .blob-2 {
+      animation: morph-blob-1 22s ease-in-out infinite alternate-reverse;
+    }
+
+    /* Floating Animations */
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-8px);
+      }
+    }
+
+    .animate-float {
+      animation: float 7s ease-in-out infinite;
+    }
+
+    .text-liquid-gradient {
+      background: linear-gradient(to right, var(--brand-cyan), #4facfe, #8a2be2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Hardware GPS Indicator */
+    .gps-hud-beacon {
+      width: 26px;
+      height: 26px;
+      position: relative;
+    }
+
+    .gps-core {
+      width: 14px;
+      height: 14px;
+      background: #007aff;
+      border: 2.5px solid #ffffff;
+      border-radius: 50%;
+      box-shadow: 0 0 16px #007aff;
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      z-index: 2;
+    }
+
+    .gps-halo {
+      position: absolute;
+      top: -7px;
+      left: -7px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0, 122, 255, 0.6) 0%, rgba(0, 242, 254, 0.1) 60%, transparent 80%);
+      animation: pulse-ring 2s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+    }
+
+    @keyframes pulse-ring {
+      0% {
+        transform: scale(0.35);
+        opacity: 0.95;
+      }
+
+      100% {
+        transform: scale(2.4);
+        opacity: 0;
+      }
+    }
+
+    .leaflet-container {
+      background: #05070e !important;
+    }
+
+    input[type="text"] {
+      font-size: 16px !important;
+    }
+  </style>
+</head>
+
+<body class="min-h-[100dvh] flex flex-col relative select-none">
+
+  <!-- Morphing Liquid Background Blobs -->
+  <div
+    class="liquid-blob blob-1 -top-20 -left-20 w-[400px] h-[400px] sm:w-[600px] sm:h-[600px] bg-gradient-to-tr from-cyan-400/30 to-blue-600/40">
+  </div>
+  <div
+    class="liquid-blob blob-2 top-1/4 -right-20 w-[400px] h-[400px] sm:w-[650px] sm:h-[650px] bg-gradient-to-tr from-blue-500/30 to-purple-600/30">
+  </div>
+
+  <!-- FLOATING APP HEADER -->
+  <header
+    class="fixed top-3 sm:top-5 left-3 right-3 sm:left-5 sm:right-5 z-[500] pointer-events-none flex items-center justify-between">
+    <div
+      class="pointer-events-auto liquid-glass rounded-[24px] sm:rounded-[28px] px-3 py-2 sm:px-4 sm:py-2.5 flex items-center gap-2 sm:gap-4 shadow-2xl">
+
+      <!-- Logo -->
+      <div class="flex items-center gap-2.5 cursor-pointer group" onclick="navigateTo('home')">
+        <div
+          class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-cyan-400 via-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/40 group-hover:scale-105 transition-transform duration-300">
+          <i data-lucide="compass" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+        </div>
+        <div class="flex flex-col hidden sm:flex">
+          <div class="flex items-center gap-1.5">
+            <span class="text-[15px] font-black tracking-tight text-[var(--text-main)]">Oasis<span
+                class="text-[var(--brand-blue)]">-trips</span></span>
+            <span
+              class="text-[9px] px-1.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-400 font-extrabold tracking-wider uppercase border border-cyan-500/30">GIS</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="h-5 w-px bg-white/15 mx-0 sm:mx-1"></div>
+
+      <!-- Navigation Tabs -->
+      <nav class="flex items-center gap-0.5 sm:gap-1 text-[11px] sm:text-[13px] font-bold">
+        <button id="nav-btn-home" onclick="navigateTo('home')"
+          class="px-2.5 sm:px-3.5 py-1.5 rounded-xl sm:rounded-2xl bg-black/5 dark:bg-white/10 text-[var(--brand-blue)] transition-all flex gap-1 items-center">
+          <i data-lucide="home" class="w-3.5 h-3.5 sm:hidden"></i>
+          <span class="hidden sm:inline">Explore</span>
+        </button>
+        <button id="nav-btn-plan" onclick="navigateTo('plan')"
+          class="px-2.5 sm:px-3.5 py-1.5 rounded-xl sm:rounded-2xl text-[var(--text-muted)] hover:text-[var(--text-main)] transition-all flex gap-1 items-center">
+          <i data-lucide="map" class="w-3.5 h-3.5 sm:hidden"></i>
+          <span class="hidden sm:inline">Directions</span>
+        </button>
+        <button id="nav-btn-saved" onclick="navigateTo('saved')"
+          class="px-2.5 sm:px-3.5 py-1.5 rounded-xl sm:rounded-2xl text-[var(--text-muted)] hover:text-[var(--text-main)] transition-all flex gap-1 items-center">
+          <i data-lucide="bookmark" class="w-3.5 h-3.5 sm:hidden"></i>
+          <span class="hidden sm:inline">Bookmarks</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- Right Controls: Settings, Auth & Theme -->
+    <div class="pointer-events-auto flex items-center gap-1.5 sm:gap-2">
+      <div class="liquid-glass rounded-[20px] sm:rounded-[24px] p-1 sm:p-1.5 flex items-center shadow-2xl">
+        <!-- Firebase Auth Button -->
+        <button id="auth-btn" onclick="window.loginWithGoogle()"
+          class="p-2 sm:p-2.5 rounded-xl sm:rounded-[20px] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-black/5 dark:hover:bg-white/10 transition-all flex items-center justify-center"
+          title="Sign in with Google">
+          <i data-lucide="user" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+        </button>
+        <button onclick="toggleSettingsModal()"
+          class="p-2 sm:p-2.5 rounded-xl sm:rounded-[20px] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-black/5 dark:hover:bg-white/10 transition-all">
+          <i data-lucide="sliders" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+        </button>
+        <button onclick="toggleAppearanceMode()"
+          class="p-2 sm:p-2.5 rounded-xl sm:rounded-[20px] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-black/5 dark:hover:bg-white/10 transition-all">
+          <i data-lucide="sun-medium" class="w-4 h-4 sm:w-5 sm:h-5" id="theme-toggle-icon"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- TOAST ALERTS -->
+  <div id="toast"
+    class="fixed top-20 sm:top-24 left-1/2 -translate-x-1/2 z-[1100] liquid-glass px-4 sm:px-5 py-2.5 sm:py-3 rounded-3xl flex items-center gap-2 sm:gap-3 transition-all duration-300 transform -translate-y-24 opacity-0 pointer-events-none shadow-2xl w-max max-w-[90vw]">
+    <div class="p-1 sm:p-1.5 rounded-full bg-cyan-500/20 text-cyan-400 relative z-10">
+      <i id="toast-icon" data-lucide="sparkles" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+    </div>
+    <span id="toast-msg"
+      class="text-xs sm:text-sm font-bold tracking-tight text-[var(--text-main)] relative z-10 truncate"></span>
+  </div>
+
+  <!-- SETTINGS MODAL (EXPANDED WITH TRANSPARENT TOGGLES) -->
+  <div id="settings-modal"
+    class="fixed inset-0 z-[1000] bg-black/40 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity duration-300">
+    <div
+      class="liquid-glass w-full max-w-md rounded-[32px] sm:rounded-[36px] p-6 sm:p-7 shadow-2xl space-y-5 sm:space-y-6 transform transition-transform duration-300 scale-95"
+      id="settings-content">
+
+      <div class="relative z-10">
+        <div class="flex items-center justify-between pb-4 border-b border-black/10 dark:border-white/10">
+          <div class="flex items-center gap-3">
+            <div
+              class="p-2 sm:p-2.5 rounded-xl sm:rounded-2xl bg-gradient-to-br from-blue-500/10 to-cyan-500/20 text-[var(--brand-cyan)] border border-cyan-500/20">
+              <i data-lucide="settings-2" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+            </div>
+            <div>
+              <h3 class="text-base sm:text-lg font-bold text-[var(--text-main)]">Preferences</h3>
+              <p class="text-[10px] sm:text-xs text-[var(--text-muted)]">Tailor your rendering & data</p>
+            </div>
+          </div>
+          <button onclick="toggleSettingsModal()"
+            class="p-2 rounded-full hover:bg-black/10 dark:hover:bg-white/10 text-[var(--text-muted)] transition-colors">
+            <i data-lucide="x" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+          </button>
+        </div>
+
+        <div class="space-y-4 sm:space-y-5 text-sm font-medium mt-4">
+          <!-- Units Toggle -->
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-[var(--text-main)] font-bold text-sm">Distance Units</p>
+              <p class="text-[10px] sm:text-[11px] text-[var(--text-muted)] mt-0.5">Metric or imperial layout</p>
+            </div>
+            <div
+              class="flex bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10 p-1 sm:p-1.5 rounded-xl sm:rounded-2xl shadow-inner">
+              <button onclick="setUnits('km')" id="unit-km-btn"
+                class="px-3 sm:px-4 py-1.5 rounded-lg sm:rounded-xl text-xs font-bold bg-[var(--brand-blue)] text-white shadow-md">KM</button>
+              <button onclick="setUnits('mi')" id="unit-mi-btn"
+                class="px-3 sm:px-4 py-1.5 rounded-lg sm:rounded-xl text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--text-main)]">Miles</button>
+            </div>
+          </div>
+
+          <!-- Satellite Hybrid (Transparent Toggle) -->
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-[var(--text-main)] font-bold text-sm">Satellite Hybrid</p>
+              <p class="text-[10px] sm:text-[11px] text-[var(--text-muted)] mt-0.5">Show city labels on map</p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer group">
+              <input type="checkbox" id="setting-satellite-hybrid" checked
+                onchange="toggleSatelliteHybrid(this.checked)" class="sr-only peer">
+              <!-- Glass Track -->
+              <div
+                class="glass-toggle w-10 h-5 sm:w-11 sm:h-6 bg-black/10 dark:bg-white/5 border border-black/10 dark:border-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white/90 after:border after:border-black/5 after:rounded-full after:h-4 after:w-4 sm:after:h-5 sm:after:w-5 after:transition-all after:shadow-sm peer-checked:bg-cyan-500/50 peer-checked:border-cyan-400/50 backdrop-blur-md">
+              </div>
+            </label>
+          </div>
+
+          <!-- Live Traffic Overlay (Mock) -->
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-[var(--text-main)] font-bold text-sm">Live Traffic</p>
+              <p class="text-[10px] sm:text-[11px] text-[var(--text-muted)] mt-0.5">Show real-time congestion</p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer group">
+              <input type="checkbox" class="sr-only peer">
+              <div
+                class="glass-toggle w-10 h-5 sm:w-11 sm:h-6 bg-black/10 dark:bg-white/5 border border-black/10 dark:border-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white/90 after:border after:border-black/5 after:rounded-full after:h-4 after:w-4 sm:after:h-5 sm:after:w-5 after:transition-all after:shadow-sm peer-checked:bg-cyan-500/50 peer-checked:border-cyan-400/50 backdrop-blur-md">
+              </div>
+            </label>
+          </div>
+
+          <!-- Data Saver Mode -->
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-[var(--text-main)] font-bold text-sm">Data Saver</p>
+              <p class="text-[10px] sm:text-[11px] text-[var(--text-muted)] mt-0.5">Lower tile resolution to save KB</p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer group">
+              <input type="checkbox" checked disabled class="sr-only peer">
+              <div
+                class="glass-toggle w-10 h-5 sm:w-11 sm:h-6 bg-black/10 dark:bg-white/5 border border-black/10 dark:border-white/10 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white/90 after:border after:border-black/5 after:rounded-full after:h-4 after:w-4 sm:after:h-5 sm:after:w-5 after:transition-all after:shadow-sm peer-checked:bg-cyan-500/50 peer-checked:border-cyan-400/50 backdrop-blur-md opacity-50">
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="pt-5 sm:pt-6">
+          <button onclick="toggleSettingsModal()"
+            class="liquid-button w-full text-white font-bold py-3 sm:py-3.5 rounded-xl sm:rounded-2xl text-sm transition-all flex items-center justify-center gap-2">
+            Apply Preferences
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN VIEWPORT CONTAINER -->
+  <main class="flex-1 w-full h-full relative">
+
+    <!-- VIEW 1: HOME DISCOVERY (RESPONSIVE) -->
+    <section id="view-home"
+      class="absolute inset-0 z-20 flex flex-col items-center justify-center px-4 pt-20 pb-8 sm:pt-24 overflow-y-auto pointer-events-none">
+
+      <div class="w-full max-w-2xl pointer-events-auto space-y-6 sm:space-y-8 text-center animate-float">
+
+        <!-- Top Badge -->
+        <div
+          class="inline-flex items-center gap-2 liquid-glass px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full text-[10px] sm:text-xs font-bold text-[var(--text-main)] shadow-2xl">
+          <span class="relative z-10 flex items-center gap-2">
+            <span
+              class="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-cyan-400 shadow-[0_0_10px_#00f2fe] animate-pulse"></span>
+            100% Free & Open-Source GIS Engine
+          </span>
+        </div>
+
+        <!-- Hero Typography -->
+        <div class="space-y-2 sm:space-y-3 px-2">
+          <h1
+            class="text-4xl sm:text-5xl md:text-6xl font-black tracking-tighter text-[var(--text-main)] drop-shadow-lg leading-tight">
+            Immerse in <span class="text-liquid-gradient">Oasis</span>
+          </h1>
+          <p
+            class="text-xs sm:text-sm md:text-base text-[var(--text-muted)] max-w-sm sm:max-w-lg mx-auto font-medium leading-relaxed">
+            Crystal-clear satellite exploration, accurate routing, and live visual intelligence.
+          </p>
+        </div>
+
+        <!-- Main Liquid Glass Search Hub -->
+        <div
+          class="liquid-glass p-4 sm:p-5 rounded-[32px] sm:rounded-[40px] text-left shadow-[0_20px_40px_-10px_rgba(0,0,0,0.3)] relative mx-auto w-full">
+          <div class="relative z-10">
+            <div class="flex items-center gap-2 mb-3 sm:mb-4 px-1 sm:px-2">
+              <div class="p-1 sm:p-1.5 rounded-lg bg-blue-500/10 dark:bg-blue-500/20 text-[var(--brand-blue)]">
+                <i data-lucide="map" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+              </div>
+              <span class="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[var(--text-muted)]">Plan
+                Expedition</span>
+            </div>
+
+            <form onsubmit="initiateRouteFromHome(event)" class="space-y-2.5 sm:space-y-3">
+              <!-- Origin -->
+              <div class="relative">
+                <div
+                  class="glass-input-box rounded-2xl sm:rounded-3xl px-3 sm:px-4 py-2.5 sm:py-3.5 flex items-center gap-2 sm:gap-3">
+                  <i data-lucide="circle-dot" class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-500 shrink-0"></i>
+                  <input type="text" id="home-origin-input" placeholder="Start address or city..."
+                    oninput="handleSearchAutocomplete(this.value, 'home-origin-suggest', 'home-origin-input')"
+                    class="bg-transparent outline-none w-full text-[var(--text-main)] placeholder:text-[var(--text-muted)] font-semibold"
+                    autocomplete="off" required />
+                  <button type="button" onclick="loadMyCurrentGPSLocation('home-origin-input')"
+                    class="p-1.5 rounded-xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10 text-[var(--text-muted)] hover:text-cyan-500 transition-all"
+                    title="Acquire My GPS Location">
+                    <i data-lucide="locate" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+                  </button>
+                </div>
+                <div id="home-origin-suggest"
+                  class="hidden absolute left-0 right-0 top-[105%] liquid-glass rounded-2xl sm:rounded-3xl max-h-48 sm:max-h-52 overflow-y-auto divide-y divide-black/5 dark:divide-white/10 z-50 shadow-2xl">
+                  <div id="home-origin-suggest-content" class="relative z-10"></div>
+                </div>
+              </div>
+
+              <!-- Destination -->
+              <div class="relative">
+                <div
+                  class="glass-input-box rounded-2xl sm:rounded-3xl px-3 sm:px-4 py-2.5 sm:py-3.5 flex items-center gap-2 sm:gap-3">
+                  <i data-lucide="map-pin" class="w-4 h-4 sm:w-5 sm:h-5 text-rose-500 shrink-0"></i>
+                  <input type="text" id="home-destination-input" placeholder="Destination (monument, lake)..."
+                    oninput="handleSearchAutocomplete(this.value, 'home-dest-suggest', 'home-destination-input')"
+                    class="bg-transparent outline-none w-full text-[var(--text-main)] placeholder:text-[var(--text-muted)] font-semibold"
+                    autocomplete="off" required />
+                </div>
+                <div id="home-dest-suggest"
+                  class="hidden absolute left-0 right-0 top-[105%] liquid-glass rounded-2xl sm:rounded-3xl max-h-48 sm:max-h-52 overflow-y-auto divide-y divide-black/5 dark:divide-white/10 z-50 shadow-2xl">
+                  <div id="home-dest-suggest-content" class="relative z-10"></div>
+                </div>
+              </div>
+
+              <button type="submit"
+                class="liquid-button w-full text-white font-bold text-xs sm:text-sm py-3 sm:py-4 rounded-2xl sm:rounded-3xl mt-1 sm:mt-2 flex items-center justify-center gap-2">
+                <i data-lucide="navigation" class="w-4 h-4 sm:w-4.5 sm:h-4.5 fill-white"></i> Calculate Express Route
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Curated Liquid Cards -->
+        <div class="text-left space-y-2 sm:space-y-3 pt-2 sm:pt-4">
+          <div class="flex items-center justify-between px-2">
+            <span class="text-[10px] sm:text-xs font-bold text-[var(--text-muted)] uppercase tracking-widest">Trending
+              Locations</span>
+          </div>
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5" id="curated-places-grid">
+            <!-- Dynamic Curated Landmarks -->
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- VIEW 2: INTERACTIVE MAP VIEW -->
+    <section id="view-plan" class="hidden w-full h-full relative">
+      <!-- LEAFLET CANVAS -->
+      <div id="leaflet-main-map" class="w-full h-full absolute inset-0 z-0"></div>
+
+      <!-- MAP FLOATING ACTION BUTTONS (Responsive Positioning) -->
+      <div class="absolute top-20 sm:top-24 right-3 sm:right-5 z-[400] flex flex-col gap-2 sm:gap-3">
+        <button onclick="toggleRealtimeGPSLock()" id="btn-gps-lock"
+          class="liquid-glass p-2.5 sm:p-3.5 rounded-[18px] sm:rounded-2xl text-[var(--text-main)] hover:text-cyan-500 shadow-lg transition-all"
+          title="Current GPS Location">
+          <i data-lucide="crosshair" class="w-4 h-4 sm:w-5 sm:h-5 relative z-10" id="gps-icon-indicator"></i>
+        </button>
+
+        <button onclick="toggleLayerMenuSelector()"
+          class="liquid-glass p-2.5 sm:p-3.5 rounded-[18px] sm:rounded-2xl text-[var(--text-main)] hover:text-cyan-500 shadow-lg transition-all"
+          title="Satellite & Basemaps">
+          <i data-lucide="layers" class="w-4 h-4 sm:w-5 sm:h-5 relative z-10"></i>
+        </button>
+
+        <div class="liquid-glass rounded-[18px] sm:rounded-2xl p-1 sm:p-1.5 flex flex-col gap-1 shadow-lg">
+          <button onclick="zoomMap(1)"
+            class="p-2 sm:p-2.5 text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-black/5 dark:hover:bg-white/10 rounded-xl transition-all relative z-10">
+            <i data-lucide="plus" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+          </button>
+          <div class="h-px bg-black/10 dark:bg-white/10 mx-2 relative z-10"></div>
+          <button onclick="zoomMap(-1)"
+            class="p-2 sm:p-2.5 text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-black/5 dark:hover:bg-white/10 rounded-xl transition-all relative z-10">
+            <i data-lucide="minus" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+          </button>
+        </div>
+
+        <!-- Basemap Selection Flyout -->
+        <div id="layer-drawer-panel"
+          class="hidden absolute right-14 sm:right-16 top-12 sm:top-16 flex flex-col gap-1 p-2.5 sm:p-3 liquid-glass rounded-2xl sm:rounded-3xl shadow-2xl z-[500] w-48 sm:w-56">
+          <div class="relative z-10">
+            <span
+              class="text-[9px] sm:text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-widest px-2 py-1 mb-1 block">Basemap
+              Engine</span>
+            <button onclick="setMapBaseLayer('satellite')"
+              class="w-full p-2 sm:p-2.5 text-[11px] sm:text-xs font-bold text-left rounded-xl hover:bg-black/5 dark:hover:bg-white/10 flex items-center gap-2 sm:gap-3 transition-all text-[var(--text-main)]">
+              <div class="w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]"></div> Clear
+              Satellite
+            </button>
+            <button onclick="setMapBaseLayer('dark')"
+              class="w-full p-2 sm:p-2.5 text-[11px] sm:text-xs font-bold text-left rounded-xl hover:bg-black/5 dark:hover:bg-white/10 flex items-center gap-2 sm:gap-3 transition-all text-[var(--text-main)]">
+              <div class="w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#22d3ee]"></div> Cyber Dark
+            </button>
+            <button onclick="setMapBaseLayer('voyager')"
+              class="w-full p-2 sm:p-2.5 text-[11px] sm:text-xs font-bold text-left rounded-xl hover:bg-black/5 dark:hover:bg-white/10 flex items-center gap-2 sm:gap-3 transition-all text-[var(--text-main)]">
+              <div class="w-3 h-3 sm:w-3.5 sm:h-3.5 rounded-full bg-blue-500 shadow-[0_0_8px_#3b82f6]"></div> Voyager
+              Clean
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PLACE INSPECTOR CARD (Mobile Optimized: snugs to bottom or floats on desktop) -->
+      <div id="place-inspector-card"
+        class="hidden absolute bottom-3 left-3 right-3 sm:bottom-auto sm:right-auto sm:top-24 sm:left-5 z-[450] sm:w-[340px] liquid-glass rounded-[28px] sm:rounded-[32px] overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.3)] transition-all duration-300 transform scale-95 opacity-0">
+
+        <div class="relative h-40 sm:h-48 w-full bg-slate-900 overflow-hidden z-10">
+          <img id="inspector-image" src="" alt="Destination Image"
+            class="w-full h-full object-cover transition-transform duration-700 hover:scale-105" />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+          <button onclick="closePlaceInspector()"
+            class="absolute top-3 right-3 p-1.5 sm:p-2 rounded-full bg-black/40 backdrop-blur-md text-white hover:bg-black/60 transition-all border border-white/20">
+            <i data-lucide="x" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+          </button>
+          <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between">
+            <span id="inspector-tag"
+              class="text-[9px] sm:text-[10px] font-bold px-2.5 py-1 rounded-full bg-cyan-500/80 backdrop-blur-md text-white uppercase tracking-wider shadow border border-white/20">Landmark</span>
+          </div>
+        </div>
+        <div class="p-4 sm:p-5 space-y-2.5 sm:space-y-3 relative z-10">
+          <div>
+            <h3 id="inspector-title" class="font-black text-sm sm:text-base text-[var(--text-main)] leading-tight">Place
+              Name</h3>
+            <p id="inspector-coords" class="text-[10px] sm:text-[11px] font-medium text-[var(--text-muted)] mt-0.5">
+              Coordinates</p>
+          </div>
+          <p id="inspector-description"
+            class="text-xs sm:text-[13px] text-[var(--text-muted)] line-clamp-2 sm:line-clamp-3 leading-relaxed font-medium">
+            Fetching encyclopedic synopsis...
+          </p>
+          <div class="flex items-center gap-2 pt-1 sm:pt-2">
+            <button id="inspector-btn-nav"
+              class="liquid-button flex-1 text-white py-2 sm:py-2.5 rounded-xl sm:rounded-2xl text-xs font-bold flex items-center justify-center gap-2">
+              <i data-lucide="navigation-2" class="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-white"></i> Route Here
+            </button>
+            <button id="inspector-btn-origin"
+              class="px-3 sm:px-4 glass-input-box hover:bg-black/5 dark:hover:bg-white/10 text-[var(--text-main)] py-2 sm:py-2.5 rounded-xl sm:rounded-2xl text-xs font-bold transition-colors">
+              Set Origin
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ROUTE DRAWER & TURN-BY-TURN PANEL (Mobile Full Bottom Sheet) -->
+      <div id="route-panel-drawer"
+        class="absolute left-0 bottom-0 w-full sm:left-5 sm:bottom-5 sm:w-[400px] sm:max-h-[80vh] h-auto max-h-[85vh] z-[300] flex flex-col liquid-glass rounded-t-[32px] sm:rounded-[36px] shadow-[0_-10px_40px_rgba(0,0,0,0.3)] sm:shadow-[0_20px_50px_rgba(0,0,0,0.4)] transition-transform duration-300 transform translate-y-0 pb-[env(safe-area-inset-bottom)]">
+
+        <div class="relative z-10 flex flex-col h-full max-h-[85vh]">
+          <!-- Drag Collapse Grip -->
+          <div
+            class="pt-3 pb-2 flex justify-center cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors shrink-0"
+            onclick="toggleDrawerCollapse()">
+            <div class="w-10 sm:w-12 h-1.5 rounded-full bg-black/20 dark:bg-white/20"></div>
+          </div>
+
+          <div class="p-4 sm:p-5 pt-0 sm:pt-1 border-b border-black/10 dark:border-white/10 shrink-0">
+            <div class="flex items-center justify-between pb-2 sm:pb-3">
+              <span
+                class="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[var(--text-muted)] flex items-center gap-1.5 sm:gap-2">
+                <i data-lucide="route" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-cyan-500"></i> Navigator
+              </span>
+              <span id="route-calc-pill"
+                class="text-[9px] sm:text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/15 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full border border-emerald-500/20 hidden">Optimal
+                Path</span>
+            </div>
+
+            <form onsubmit="calculateTrip(event)" class="space-y-2.5 sm:space-y-3">
+              <!-- Origin Input -->
+              <div class="relative">
+                <div class="glass-input-box rounded-xl sm:rounded-2xl px-3 sm:px-3.5 py-2 sm:py-2.5 flex items-center">
+                  <i data-lucide="circle-dot" class="text-emerald-500 w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2.5 shrink-0"></i>
+                  <input type="text" id="route-origin" placeholder="Starting point"
+                    oninput="handleSearchAutocomplete(this.value, 'panel-origin-suggest', 'route-origin')"
+                    class="bg-transparent w-full outline-none font-semibold text-[var(--text-main)]" required />
+                  <button type="button" onclick="loadMyCurrentGPSLocation('route-origin')"
+                    class="p-1 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 text-[var(--text-muted)] hover:text-cyan-500 transition-colors">
+                    <i data-lucide="locate" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+                  </button>
+                </div>
+                <div id="panel-origin-suggest"
+                  class="hidden absolute left-0 right-0 top-[105%] liquid-glass rounded-xl sm:rounded-2xl max-h-40 overflow-y-auto divide-y divide-black/5 dark:divide-white/10 z-50">
+                  <div id="panel-origin-suggest-content" class="relative z-10"></div>
+                </div>
+              </div>
+
+              <!-- Destination Input -->
+              <div class="relative">
+                <div class="glass-input-box rounded-xl sm:rounded-2xl px-3 sm:px-3.5 py-2 sm:py-2.5 flex items-center">
+                  <i data-lucide="map-pin" class="text-rose-500 w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2.5 shrink-0"></i>
+                  <input type="text" id="route-destination" placeholder="Destination"
+                    oninput="handleSearchAutocomplete(this.value, 'panel-dest-suggest', 'route-destination')"
+                    class="bg-transparent w-full outline-none font-semibold text-[var(--text-main)]" required />
+                </div>
+                <div id="panel-dest-suggest"
+                  class="hidden absolute left-0 right-0 top-[105%] liquid-glass rounded-xl sm:rounded-2xl max-h-40 overflow-y-auto divide-y divide-black/5 dark:divide-white/10 z-50">
+                  <div id="panel-dest-suggest-content" class="relative z-10"></div>
+                </div>
+              </div>
+
+              <!-- Transport Selector -->
+              <div
+                class="grid grid-cols-3 gap-1 sm:gap-1.5 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10 p-1 sm:p-1.5 rounded-xl sm:rounded-2xl shadow-inner">
+                <button type="button" id="mode-drive" onclick="setTransportMode('drive')"
+                  class="py-1.5 text-[10px] sm:text-xs font-bold rounded-lg sm:rounded-xl bg-white dark:bg-white/10 text-cyan-600 dark:text-cyan-400 shadow-sm border border-black/5 dark:border-cyan-500/20">
+                  🚗 Drive
+                </button>
+                <button type="button" id="mode-transit" onclick="setTransportMode('transit')"
+                  class="py-1.5 text-[10px] sm:text-xs font-semibold rounded-lg sm:rounded-xl text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors">
+                  🚆 Transit
+                </button>
+                <button type="button" id="mode-walk" onclick="setTransportMode('walk')"
+                  class="py-1.5 text-[10px] sm:text-xs font-semibold rounded-lg sm:rounded-xl text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors">
+                  🚶 Walk
+                </button>
+              </div>
+
+              <button type="submit"
+                class="liquid-button w-full text-white font-bold py-2.5 sm:py-3 rounded-xl sm:rounded-2xl text-xs sm:text-sm flex items-center justify-center gap-2">
+                <i data-lucide="play" class="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-white"></i> Start Routing
+              </button>
+            </form>
+          </div>
+
+          <!-- Telemetry Results Scroll Area -->
+          <div id="drawer-scroll-content" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3 sm:space-y-4">
+            <div id="panel-empty-state" class="text-center py-6 sm:py-8">
+              <div
+                class="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10 flex items-center justify-center mx-auto mb-2 sm:mb-3">
+                <i data-lucide="compass" class="w-6 h-6 sm:w-8 sm:h-8 text-[var(--text-muted)] opacity-50"></i>
+              </div>
+              <p class="text-[11px] sm:text-xs font-medium text-[var(--text-muted)] leading-relaxed">Specify points
+                above or click map to inspect.</p>
+            </div>
+
+            <div id="planner-active-dashboard" class="hidden flex-col gap-3 sm:gap-4">
+              <div class="grid grid-cols-2 gap-2 sm:gap-3">
+                <div class="p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl glass-input-box">
+                  <span
+                    class="text-[9px] sm:text-[10px] uppercase font-bold text-[var(--text-muted)] tracking-widest">Travel
+                    Time</span>
+                  <p class="text-lg sm:text-xl font-black text-cyan-600 dark:text-cyan-400 mt-0.5 sm:mt-1"
+                    id="metric-time">--</p>
+                </div>
+                <div class="p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl glass-input-box">
+                  <span
+                    class="text-[9px] sm:text-[10px] uppercase font-bold text-[var(--text-muted)] tracking-widest">Distance</span>
+                  <p class="text-lg sm:text-xl font-black text-[var(--text-main)] mt-0.5 sm:mt-1" id="metric-dist">--
+                  </p>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2 sm:gap-2.5">
+                <button onclick="saveItineraryToArchive()"
+                  class="flex-1 glass-input-box py-2 sm:py-2.5 rounded-xl sm:rounded-2xl text-[11px] sm:text-xs font-bold flex items-center justify-center gap-1.5 sm:gap-2 text-[var(--text-main)] hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
+                  <i data-lucide="bookmark" class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-cyan-500"></i> Save
+                </button>
+                <button onclick="clearCurrentRoute()"
+                  class="px-3 sm:px-4 glass-input-box py-2 sm:py-2.5 rounded-xl sm:rounded-2xl text-[11px] sm:text-xs font-bold text-rose-500 hover:bg-rose-500/10 transition-colors">
+                  Clear
+                </button>
+              </div>
+
+              <div class="space-y-1.5 sm:space-y-2 pt-1 sm:pt-2">
+                <div class="flex items-center justify-between px-1">
+                  <span
+                    class="text-[9px] sm:text-[10px] uppercase font-bold text-[var(--text-muted)] tracking-widest">Turn
+                    Guidance</span>
+                  <span id="route-step-count"
+                    class="text-[9px] sm:text-[10px] font-bold text-cyan-700 dark:text-cyan-400 bg-cyan-500/10 px-1.5 py-0.5 sm:px-2 sm:py-0.5 rounded-md border border-cyan-500/20">0
+                    steps</span>
+                </div>
+                <div id="guidance-direction-list" class="space-y-1.5 sm:space-y-2 pr-1"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 3: SAVED TRIPS -->
+    <section id="view-saved"
+      class="hidden absolute inset-0 z-20 flex justify-center items-center p-3 sm:p-6 overflow-hidden pt-20 sm:pt-24">
+      <div
+        class="liquid-glass w-full max-w-2xl h-[85vh] sm:h-[80vh] rounded-[32px] sm:rounded-[40px] flex flex-col shadow-[0_20px_40px_rgba(0,0,0,0.3)] relative">
+        <div class="relative z-10 flex flex-col h-full">
+          <div
+            class="p-5 sm:p-7 border-b border-black/10 dark:border-white/10 flex items-center justify-between shrink-0">
+            <div>
+              <h2 class="text-2xl sm:text-3xl font-black text-[var(--text-main)] flex items-center gap-2 sm:gap-3">
+                <i data-lucide="bookmark-check" class="text-cyan-500 w-6 h-6 sm:w-8 sm:h-8"></i> Saved Trips
+              </h2>
+              <p class="text-xs sm:text-sm font-medium text-[var(--text-muted)] mt-0.5 sm:mt-1">Locally bookmarked
+                routes.</p>
+            </div>
+            <button onclick="navigateTo('plan')"
+              class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl sm:rounded-2xl glass-input-box text-[10px] sm:text-xs font-bold text-cyan-600 dark:text-cyan-400 hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
+              Close
+            </button>
+          </div>
+
+          <div class="flex-1 overflow-y-auto p-4 sm:p-7">
+            <div id="archives-empty-panel" class="text-center py-16 sm:py-20">
+              <div
+                class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10 flex items-center justify-center mx-auto mb-3 sm:mb-4">
+                <i data-lucide="bookmark-minus" class="w-8 h-8 sm:w-10 sm:h-10 text-[var(--text-muted)] opacity-40"></i>
+              </div>
+              <p class="text-xs sm:text-sm font-medium text-[var(--text-muted)]">No bookmarks saved yet.</p>
+            </div>
+
+            <div id="saved-itinerary-grid" class="space-y-2 sm:space-y-3 hidden"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FIREBASE (Google Authentication SDK) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    // REPLACE WITH YOUR FIREBASE CONFIG
+    const firebaseConfig = {
+      apiKey: "AIzaSyBMduWaCiRiKvkeyikXYSAWlCuBttK78eI",
+      authDomain: "oasis-trips.firebaseapp.com",
+      projectId: "oasis-trips",
+      storageBucket: "oasis-trips.firebasestorage.app",
+      messagingSenderId: "863614400961",
+      appId: "1:863614400961:web:323ef611c8ba0239859740",
+      measurementId: "G-LTS6HG0D70"
+    };
+
+    let auth, provider;
+    try {
+      const app = initializeApp(firebaseConfig);
+      auth = getAuth(app);
+      provider = new GoogleAuthProvider();
+    } catch (e) {
+      console.warn("Firebase not configured yet.");
+    }
+
+    // Attach handlers to Window so standard HTML buttons can access them
+    window.loginWithGoogle = () => {
+      if (!auth || firebaseConfig.apiKey === "YOUR_API_KEY") {
+        window.dispatchToast("Configure Firebase keys in HTML to enable Auth");
+        return;
+      }
+      window.dispatchToast("Opening Google Sign-In...");
+      signInWithPopup(auth, provider).then((result) => {
+        window.dispatchToast(`Welcome, ${result.user.displayName}`);
+      }).catch((error) => {
+        window.dispatchToast(error.message);
+      });
+    };
+
+    window.logoutGoogle = () => {
+      if (auth) {
+        signOut(auth).then(() => window.dispatchToast("Successfully signed out."));
+      }
+    };
+
+    if (auth) {
+      onAuthStateChanged(auth, (user) => {
+        const btn = document.getElementById('auth-btn');
+        if (user) {
+          btn.innerHTML = `<img src="${user.photoURL}" class="w-5 h-5 sm:w-6 sm:h-6 rounded-full border border-white/20">`;
+          btn.title = "Sign Out";
+          btn.onclick = window.logoutGoogle;
+        } else {
+          btn.innerHTML = `<i data-lucide="user" class="w-4 h-4 sm:w-5 sm:h-5"></i>`;
+          btn.title = "Sign in with Google";
+          btn.onclick = window.loginWithGoogle;
+        }
+        lucide.createIcons();
+      });
+    }
+  </script>
+
+  <!-- MAIN APP SCRIPT -->
+  <script>
+    const OASIS_DESTINATIONS = [
+      { name: "Taj Mahal", location: "Agra, Uttar Pradesh", coords: [27.1751, 78.0421], tag: "Heritage", img: "https://images.unsplash.com/photo-1564507592333-c60657eea523?w=600&auto=format&fit=crop&q=80" },
+      { name: "Gateway of India", location: "Mumbai, Maharashtra", coords: [18.9220, 72.8347], tag: "Coastal", img: "https://images.unsplash.com/photo-1570168007204-dfb528c6958f?w=600&auto=format&fit=crop&q=80" },
+      { name: "Pangong Tso", location: "Ladakh, India", coords: [33.7595, 78.6674], tag: "Alpine Lake", img: "https://images.unsplash.com/photo-1581793745862-99fde7fa73d2?w=600&auto=format&fit=crop&q=80" },
+      { name: "Mysore Palace", location: "Mysuru, Karnataka", coords: [12.3051, 76.6551], tag: "Palace", img: "https://images.unsplash.com/photo-1600100397608-f010e42e5df8?w=600&auto=format&fit=crop&q=80" }
+    ];
+
+    let savedTrips = JSON.parse(localStorage.getItem('oasis_saved_trips_mobile')) || [];
+    let appSettings = {
+      isDarkMode: true,
+      mapStyle: 'satellite',
+      transportMode: 'drive',
+      units: 'km',
+      satelliteHybrid: true,
+      highAccuracyGps: true,
+      gpsEnabled: false
+    };
+
+    let baseMap = null;
+    let baseTileLayer = null;
+    let satelliteLabelLayer = null;
+    let routePolylineLayer = null;
+    let originMarker = null;
+    let destMarker = null;
+    let inspectorMarker = null;
+    let gpsUserMarker = null;
+    let gpsWatchId = null;
+
+    let currentDistanceKm = 0;
+    let currentTimeHours = 0;
+    let searchCache = { origin: '', destination: '' };
+    let autocompleteTimer = null;
+    let activeAutocompleteController = null;
+
+    const OASIS_INITIAL_COORDINATES = [20.5937, 78.9629];
+
+    document.addEventListener("DOMContentLoaded", () => {
+      initMap();
+      renderCuratedCards();
+      renderSavedList();
+      lucide.createIcons();
+    });
+
+    // --- HD PERFORMANCE ENGINE (REMOVED DETECT RETINA FOR LAG-FREE PERFORMANCE) ---
+    function initMap() {
+      if (baseMap) return;
+
+      baseMap = L.map('leaflet-main-map', {
+        zoomControl: false,
+        preferCanvas: true,
+        minZoom: 3,
+        maxZoom: 21
+      }).setView(OASIS_INITIAL_COORDINATES, 5);
+
+      setMapBaseLayer('satellite');
+
+      baseMap.on('click', (e) => {
+        inspectCoordinatePoint(e.latlng.lat, e.latlng.lng);
+      });
+    }
+
+    function setMapBaseLayer(style) {
+      appSettings.mapStyle = style;
+      if (!baseMap) return;
+
+      if (baseTileLayer) baseMap.removeLayer(baseTileLayer);
+      if (satelliteLabelLayer) baseMap.removeLayer(satelliteLabelLayer);
+
+      // detectRetina removed to reduce tile load and fix lagging. maxNativeZoom stretches tiles flawlessly.
+      if (style === 'satellite') {
+        baseTileLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+          maxZoom: 21,
+          maxNativeZoom: 19,
+          attribution: ''
+        });
+
+        satelliteLabelLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png', {
+          maxZoom: 21,
+          maxNativeZoom: 19,
+          subdomains: 'abcd'
+        });
+
+        baseTileLayer.addTo(baseMap);
+        if (appSettings.satelliteHybrid) {
+          satelliteLabelLayer.addTo(baseMap);
+        }
+      } else if (style === 'dark') {
+        baseTileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+          maxZoom: 21,
+          maxNativeZoom: 19,
+          subdomains: 'abcd'
+        }).addTo(baseMap);
+      } else {
+        baseTileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+          maxZoom: 21,
+          maxNativeZoom: 19,
+          subdomains: 'abcd'
+        }).addTo(baseMap);
+      }
+
+      document.getElementById('layer-drawer-panel').classList.add('hidden');
+    }
+
+    function toggleSatelliteHybrid(enabled) {
+      appSettings.satelliteHybrid = enabled;
+      if (appSettings.mapStyle === 'satellite' && satelliteLabelLayer) {
+        if (enabled) {
+          satelliteLabelLayer.addTo(baseMap);
+        } else {
+          baseMap.removeLayer(satelliteLabelLayer);
+        }
+      }
+    }
+
+    function toggleHighGps(enabled) {
+      appSettings.highAccuracyGps = enabled;
+      if (appSettings.gpsEnabled) {
+        toggleRealtimeGPSLock();
+        toggleRealtimeGPSLock();
+      }
+    }
+
+    function toggleLayerMenuSelector() {
+      document.getElementById('layer-drawer-panel').classList.toggle('hidden');
+    }
+
+    function zoomMap(delta) {
+      if (!baseMap) return;
+      delta > 0 ? baseMap.zoomIn() : baseMap.zoomOut();
+    }
+
+    // --- CURATED SHOWCASE ---
+    function renderCuratedCards() {
+      const grid = document.getElementById('curated-places-grid');
+      grid.innerHTML = OASIS_DESTINATIONS.map((d, idx) => `
+        <div onclick="selectCuratedDestination(${idx})" 
+             class="liquid-glass rounded-[20px] sm:rounded-2xl overflow-hidden cursor-pointer group hover:scale-[1.04] hover:-translate-y-1 transition-all duration-300 shadow-md">
+          <div class="h-20 sm:h-24 w-full relative bg-slate-800 overflow-hidden z-10">
+            <img src="${d.img}" alt="${d.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-60"></div>
+            <span class="absolute top-2 left-2 text-[8px] sm:text-[9px] font-bold px-1.5 py-0.5 sm:px-2 rounded-full bg-cyan-500/80 backdrop-blur-sm text-white border border-white/20">${d.tag}</span>
+          </div>
+          <div class="p-2.5 sm:p-3 relative z-10">
+            <h4 class="font-bold text-xs sm:text-sm text-[var(--text-main)] truncate">${d.name}</h4>
+            <p class="text-[9px] sm:text-[10px] font-medium text-[var(--text-muted)] truncate mt-0.5 flex items-center gap-1">
+              <i data-lucide="map-pin" class="w-2.5 h-2.5 sm:w-3 sm:h-3 text-cyan-500"></i>${d.location}
+            </p>
+          </div>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function selectCuratedDestination(idx) {
+      const p = OASIS_DESTINATIONS[idx];
+      openPlaceInspector({
+        title: p.name,
+        subtitle: p.location,
+        coords: p.coords,
+        image: p.img,
+        tag: p.tag,
+        wikiQuery: p.name
+      });
+      navigateTo('plan');
+      baseMap.flyTo(p.coords, 14, { duration: 1.2 });
+    }
+
+    // --- REVERSE GEOCODING & VISUAL PIPELINE ---
+    async function inspectCoordinatePoint(lat, lng) {
+      dispatchToast("Resolving location details...");
+
+      if (inspectorMarker) baseMap.removeLayer(inspectorMarker);
+      inspectorMarker = L.marker([lat, lng], {
+        icon: createPinIcon('#00f2fe', 'map-pin')
+      }).addTo(baseMap);
+
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=16&addressdetails=1`);
+        const data = await res.json();
+        const title = data.name || data.address.suburb || data.address.city || data.address.town || "Exploration Marker";
+        const subtitle = [data.address.city || data.address.county, data.address.state, data.address.country].filter(Boolean).join(", ");
+
+        openPlaceInspector({
+          title: title,
+          subtitle: subtitle,
+          coords: [lat, lng],
+          tag: "Map Pin",
+          wikiQuery: title
+        });
+      } catch (e) {
+        openPlaceInspector({
+          title: "Custom Point",
+          subtitle: `${lat.toFixed(4)}°, ${lng.toFixed(4)}°`,
+          coords: [lat, lng],
+          tag: "Coordinate",
+          wikiQuery: null
+        });
+      }
+    }
+
+    async function openPlaceInspector({ title, subtitle, coords, image, tag, wikiQuery }) {
+      const card = document.getElementById('place-inspector-card');
+      const imgEl = document.getElementById('inspector-image');
+      const titleEl = document.getElementById('inspector-title');
+      const coordsEl = document.getElementById('inspector-coords');
+      const descEl = document.getElementById('inspector-description');
+      const tagEl = document.getElementById('inspector-tag');
+
+      card.classList.remove('hidden');
+      setTimeout(() => {
+        card.classList.remove('opacity-0', 'scale-95', 'translate-y-10');
+        card.classList.add('opacity-100', 'scale-100', 'translate-y-0');
+      }, 10);
+
+      titleEl.innerText = title;
+      coordsEl.innerText = subtitle || `${coords[0].toFixed(4)}° N, ${coords[1].toFixed(4)}° E`;
+      tagEl.innerText = tag || "Oasis Point";
+      descEl.innerText = "Querying live encyclopedic briefing...";
+
+      imgEl.src = image || "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&auto=format&fit=crop&q=80";
+
+      if (wikiQuery || title) {
+        try {
+          const searchKey = (wikiQuery || title).replace(/\s+/g, '_');
+          const wikiRes = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(searchKey)}`);
+          if (wikiRes.ok) {
+            const wikiData = await wikiRes.json();
+            if (wikiData.thumbnail && wikiData.thumbnail.source) {
+              imgEl.src = wikiData.thumbnail.source;
+            }
+            if (wikiData.extract) {
+              descEl.innerText = wikiData.extract;
+            }
+          }
+        } catch { }
+      }
+
+      document.getElementById('inspector-btn-nav').onclick = () => {
+        document.getElementById('route-destination').value = `${title} (${coords[0].toFixed(4)}, ${coords[1].toFixed(4)})`;
+        navigateTo('plan');
+        closePlaceInspector();
+        if (document.getElementById('route-origin').value) calculateTrip();
+      };
+
+      document.getElementById('inspector-btn-origin').onclick = () => {
+        document.getElementById('route-origin').value = `${title} (${coords[0].toFixed(4)}, ${coords[1].toFixed(4)})`;
+        navigateTo('plan');
+        closePlaceInspector();
+        if (document.getElementById('route-destination').value) calculateTrip();
+      };
+    }
+
+    function closePlaceInspector() {
+      const card = document.getElementById('place-inspector-card');
+      card.classList.remove('opacity-100', 'scale-100', 'translate-y-0');
+      card.classList.add('opacity-0', 'scale-95', 'translate-y-10');
+      setTimeout(() => {
+        card.classList.add('hidden');
+      }, 300);
+
+      if (inspectorMarker) {
+        baseMap.removeLayer(inspectorMarker);
+        inspectorMarker = null;
+      }
+    }
+
+    // --- ACCURATE GPS SENSOR ---
+    function toggleRealtimeGPSLock() {
+      appSettings.gpsEnabled = !appSettings.gpsEnabled;
+      const icon = document.getElementById('gps-icon-indicator');
+
+      if (!appSettings.gpsEnabled) {
+        if (gpsWatchId) navigator.geolocation.clearWatch(gpsWatchId);
+        if (gpsUserMarker && baseMap) baseMap.removeLayer(gpsUserMarker);
+        gpsWatchId = null;
+        gpsUserMarker = null;
+        icon.className = "w-4 h-4 sm:w-5 sm:h-5 text-[var(--text-main)] relative z-10";
+        dispatchToast("GPS tracking stopped");
+        return;
+      }
+
+      if (!navigator.geolocation) {
+        dispatchToast("Geolocation not supported by device");
+        return;
+      }
+
+      dispatchToast("Connecting to GPS satellites...");
+      gpsWatchId = navigator.geolocation.watchPosition(
+        (pos) => {
+          const { latitude, longitude } = pos.coords;
+          icon.className = "w-4 h-4 sm:w-5 sm:h-5 text-cyan-500 relative z-10";
+          const latlng = [latitude, longitude];
+
+          if (!gpsUserMarker) {
+            const beacon = L.divIcon({
+              className: 'bg-transparent',
+              html: `<div class="gps-hud-beacon"><div class="gps-halo"></div><div class="gps-core"></div></div>`,
+              iconSize: [26, 26],
+              iconAnchor: [13, 13]
+            });
+            gpsUserMarker = L.marker(latlng, { icon: beacon }).addTo(baseMap);
+            baseMap.flyTo(latlng, 16, { duration: 1.2 });
+          } else {
+            gpsUserMarker.setLatLng(latlng);
+          }
+        },
+        (err) => {
+          dispatchToast("Unable to acquire location fix");
+          icon.className = "w-4 h-4 sm:w-5 sm:h-5 text-[var(--text-main)] relative z-10";
+          appSettings.gpsEnabled = false;
+        },
+        { enableHighAccuracy: appSettings.highAccuracyGps, timeout: 10000, maximumAge: 3000 }
+      );
+    }
+
+    async function loadMyCurrentGPSLocation(inputId) {
+      if (!navigator.geolocation) return dispatchToast("Geolocation unavailable");
+      dispatchToast("Locating your coordinates...");
+
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          const { latitude, longitude } = pos.coords;
+          try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=14`);
+            const data = await res.json();
+            const locationName = data.address.city || data.address.town || data.address.suburb || "Current Location";
+            document.getElementById(inputId).value = `${locationName} (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`;
+          } catch {
+            document.getElementById(inputId).value = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+          }
+          dispatchToast("Position locked");
+          if (baseMap) baseMap.flyTo([latitude, longitude], 14);
+        },
+        () => dispatchToast("Location permission denied"),
+        { enableHighAccuracy: appSettings.highAccuracyGps }
+      );
+    }
+
+    // --- AUTOCOMPLETE ENGINE ---
+    function handleSearchAutocomplete(query, suggestBoxId, targetInputId) {
+      clearTimeout(autocompleteTimer);
+      const container = document.getElementById(suggestBoxId + "-content");
+      const parent = document.getElementById(suggestBoxId);
+
+      if (query.trim().length < 2) {
+        parent.classList.add('hidden');
+        return;
+      }
+
+      autocompleteTimer = setTimeout(async () => {
+        if (activeAutocompleteController) activeAutocompleteController.abort();
+        activeAutocompleteController = new AbortController();
+
+        try {
+          const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=5`;
+          const res = await fetch(url, { signal: activeAutocompleteController.signal });
+          const data = await res.json();
+
+          if (data && data.features && data.features.length > 0) {
+            container.innerHTML = data.features.map(f => {
+              const p = f.properties;
+              const name = p.name || 'Location';
+              const detail = [p.city || p.district, p.state, p.country].filter(Boolean).join(', ');
+              const fullTitle = `${name}, ${detail}`;
+              return `
+                <div onclick="selectLocation('${fullTitle.replace(/'/g, "\\'")}', '${suggestBoxId}', '${targetInputId}')" 
+                     class="p-3 text-[13px] text-left text-[var(--text-main)] hover:bg-black/5 dark:hover:bg-white/10 cursor-pointer truncate flex items-center gap-3 transition-colors">
+                  <div class="p-1.5 rounded-full bg-cyan-500/10 shrink-0 border border-cyan-500/20">
+                    <span class="w-1.5 h-1.5 rounded-full bg-cyan-500 block"></span>
+                  </div>
+                  <div class="truncate">
+                    <span class="font-bold block truncate">${name}</span>
+                    <span class="text-[11px] font-medium text-[var(--text-muted)] block truncate">${detail}</span>
+                  </div>
+                </div>`;
+            }).join('');
+            parent.classList.remove('hidden');
+          } else {
+            parent.classList.add('hidden');
+          }
+        } catch (e) {
+          if (e.name !== 'AbortError') parent.classList.add('hidden');
+        }
+      }, 180);
+    }
+
+    function selectLocation(val, suggestId, inputId) {
+      document.getElementById(inputId).value = val;
+      document.getElementById(suggestId).classList.add('hidden');
+    }
+
+    // --- ROUTE DIRECTIONS ENGINE ---
+    function setTransportMode(mode) {
+      appSettings.transportMode = mode;
+      ['drive', 'transit', 'walk'].forEach(m => {
+        const btn = document.getElementById(`mode-${m}`);
+        if (m === mode) {
+          btn.className = "py-1.5 text-[10px] sm:text-xs font-bold rounded-lg sm:rounded-xl bg-white dark:bg-white/10 text-cyan-600 dark:text-cyan-400 shadow-sm border border-black/5 dark:border-cyan-500/20";
+        } else {
+          btn.className = "py-1.5 text-[10px] sm:text-xs font-semibold rounded-lg sm:rounded-xl text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors";
+        }
+      });
+      if (document.getElementById('route-origin').value && document.getElementById('route-destination').value) {
+        calculateTrip();
+      }
+    }
+
+    async function parseCoordinateOrQuery(str) {
+      const coordMatch = str.match(/(-?\d+(\.\d+)?),\s*(-?\d+(\.\d+)?)/);
+      if (coordMatch) {
+        return [parseFloat(coordMatch[1]), parseFloat(coordMatch[3])];
+      }
+      const clean = str.replace(/\(.*?\)/g, '').trim();
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(clean)}`);
+      const list = await res.json();
+      if (list && list.length > 0) {
+        return [parseFloat(list[0].lat), parseFloat(list[0].lon)];
+      }
+      throw new Error(`Location missing: "${str}"`);
+    }
+
+    async function calculateTrip(e) {
+      if (e) e.preventDefault();
+      const orig = document.getElementById('route-origin').value.trim();
+      const dest = document.getElementById('route-destination').value.trim();
+      if (!orig || !dest) return;
+
+      searchCache.origin = orig;
+      searchCache.destination = dest;
+      dispatchToast("Plotting optimal route...");
+
+      try {
+        const [origCoords, destCoords] = await Promise.all([
+          parseCoordinateOrQuery(orig),
+          parseCoordinateOrQuery(dest)
+        ]);
+
+        if (originMarker) baseMap.removeLayer(originMarker);
+        if (destMarker) baseMap.removeLayer(destMarker);
+
+        originMarker = L.marker(origCoords, { icon: createPinIcon('#10b981', 'play') }).addTo(baseMap);
+        destMarker = L.marker(destCoords, { icon: createPinIcon('#ef4444', 'flag') }).addTo(baseMap);
+
+        const profile = appSettings.transportMode === 'walk' ? 'walking' : 'driving';
+        const osrmUrl = `https://router.project-osrm.org/route/v1/${profile}/${origCoords[1]},${origCoords[0]};${destCoords[1]},${destCoords[0]}?overview=full&geometries=geojson&steps=true`;
+
+        const res = await fetch(osrmUrl);
+        const data = await res.json();
+
+        if (!data.routes || data.routes.length === 0) throw new Error("No route found between points");
+
+        const route = data.routes[0];
+        currentDistanceKm = route.distance / 1000;
+        currentTimeHours = appSettings.transportMode === 'transit' ? (currentDistanceKm / 65) : (route.duration / 3600);
+
+        if (routePolylineLayer) baseMap.removeLayer(routePolylineLayer);
+
+        routePolylineLayer = L.geoJSON(route.geometry, {
+          style: {
+            color: appSettings.transportMode === 'walk' ? '#10b981' : '#00f2fe',
+            weight: 6,
+            opacity: 0.9,
+            lineCap: 'round',
+            lineJoin: 'round'
+          }
+        }).addTo(baseMap);
+
+        baseMap.fitBounds(routePolylineLayer.getBounds(), { padding: [40, 40] });
+
+        document.getElementById('panel-empty-state').classList.add('hidden');
+        document.getElementById('planner-active-dashboard').classList.remove('hidden');
+        document.getElementById('planner-active-dashboard').classList.add('flex');
+        document.getElementById('route-calc-pill').classList.remove('hidden');
+
+        updateTelemetryMetrics();
+        renderGuidanceDirections(route.legs[0].steps);
+        dispatchToast("Route generated successfully");
+      } catch (err) {
+        dispatchToast(err.message || "Failed to plot trip");
+      }
+    }
+
+    function updateTelemetryMetrics() {
+      const dist = appSettings.units === 'mi' ? (currentDistanceKm * 0.621371).toFixed(1) + ' mi' : currentDistanceKm.toFixed(1) + ' km';
+      const hours = Math.floor(currentTimeHours);
+      const mins = Math.round((currentTimeHours - hours) * 60);
+      const timeStr = hours > 0 ? `${hours}h ${mins}m` : `${mins} min`;
+
+      document.getElementById('metric-dist').innerText = dist;
+      document.getElementById('metric-time').innerText = timeStr;
+    }
+
+    function renderGuidanceDirections(steps) {
+      const container = document.getElementById('guidance-direction-list');
+      document.getElementById('route-step-count').innerText = `${steps.length} steps`;
+
+      container.innerHTML = steps.map((s) => {
+        const mod = s.maneuver.modifier || '';
+        let icon = 'arrow-up';
+        if (mod.includes('right')) icon = 'corner-up-right';
+        else if (mod.includes('left')) icon = 'corner-up-left';
+        else if (s.maneuver.type === 'arrive') icon = 'flag';
+
+        const stepDist = appSettings.units === 'mi'
+          ? (s.distance * 0.000621371).toFixed(2) + ' mi'
+          : s.distance > 1000 ? (s.distance / 1000).toFixed(1) + ' km' : Math.round(s.distance) + ' m';
+        const name = s.name ? `${s.maneuver.type.replace('_', ' ')} onto ${s.name}` : (s.maneuver.instruction || 'Follow route corridor');
+
+        return `
+          <div class="glass-input-box p-2.5 sm:p-3 rounded-[14px] sm:rounded-2xl flex items-start gap-2.5 sm:gap-3">
+            <div class="p-1.5 rounded-xl bg-cyan-500/10 text-cyan-500 shrink-0 border border-cyan-500/20">
+              <i data-lucide="${icon}" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="font-bold text-xs sm:text-[13px] text-[var(--text-main)] truncate">${name}</p>
+              <span class="text-[10px] sm:text-[11px] font-medium text-[var(--text-muted)]">${stepDist}</span>
+            </div>
+          </div>`;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function clearCurrentRoute() {
+      if (routePolylineLayer) { baseMap.removeLayer(routePolylineLayer); routePolylineLayer = null; }
+      if (originMarker) { baseMap.removeLayer(originMarker); originMarker = null; }
+      if (destMarker) { baseMap.removeLayer(destMarker); destMarker = null; }
+
+      document.getElementById('planner-active-dashboard').classList.add('hidden');
+      document.getElementById('panel-empty-state').classList.remove('hidden');
+      document.getElementById('route-calc-pill').classList.add('hidden');
+      document.getElementById('route-origin').value = '';
+      document.getElementById('route-destination').value = '';
+    }
+
+    function initiateRouteFromHome(e) {
+      if (e) e.preventDefault();
+      document.getElementById('route-origin').value = document.getElementById('home-origin-input').value;
+      document.getElementById('route-destination').value = document.getElementById('home-destination-input').value;
+      navigateTo('plan');
+      calculateTrip();
+    }
+
+    // --- DRAWER & SETTINGS TOGGLES ---
+    function toggleSettingsModal() {
+      const modal = document.getElementById('settings-modal');
+      const content = document.getElementById('settings-content');
+
+      if (modal.classList.contains('hidden')) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        void modal.offsetWidth;
+        content.classList.remove('scale-95', 'opacity-0');
+        content.classList.add('scale-100', 'opacity-100');
+      } else {
+        content.classList.remove('scale-100', 'opacity-100');
+        content.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+        }, 300);
+      }
+    }
+
+    function toggleDrawerCollapse() {
+      const drawer = document.getElementById('route-panel-drawer');
+      if (window.innerWidth < 640) {
+        if (drawer.classList.contains('translate-y-[60%]')) {
+          drawer.classList.remove('translate-y-[60%]');
+        } else {
+          drawer.classList.add('translate-y-[60%]');
+        }
+      } else {
+        document.getElementById('drawer-scroll-content').classList.toggle('hidden');
+      }
+    }
+
+    function setUnits(unit) {
+      appSettings.units = unit;
+      const kmBtn = document.getElementById('unit-km-btn');
+      const miBtn = document.getElementById('unit-mi-btn');
+      if (unit === 'km') {
+        kmBtn.className = "px-3 sm:px-4 py-1.5 rounded-lg sm:rounded-xl text-xs font-bold bg-[var(--brand-blue)] text-white shadow-md";
+        miBtn.className = "px-3 sm:px-4 py-1.5 rounded-lg sm:rounded-xl text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--text-main)]";
+      } else {
+        miBtn.className = "px-3 sm:px-4 py-1.5 rounded-lg sm:rounded-xl text-xs font-bold bg-[var(--brand-blue)] text-white shadow-md";
+        kmBtn.className = "px-3 sm:px-4 py-1.5 rounded-lg sm:rounded-xl text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--text-main)]";
+      }
+      if (currentDistanceKm > 0) updateTelemetryMetrics();
+    }
+
+    // --- SAVED BOOKMARKS ---
+    function saveItineraryToArchive() {
+      if (!searchCache.origin || !searchCache.destination) return;
+      savedTrips.unshift({
+        id: Date.now(),
+        origin: searchCache.origin,
+        destination: searchCache.destination,
+        distance: currentDistanceKm.toFixed(1),
+        date: new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+      });
+      localStorage.setItem('oasis_saved_trips_mobile', JSON.stringify(savedTrips));
+      renderSavedList();
+      window.dispatchToast("Expedition archived in Oasis");
+    }
+
+    function renderSavedList() {
+      const empty = document.getElementById('archives-empty-panel');
+      const grid = document.getElementById('saved-itinerary-grid');
+      if (savedTrips.length === 0) {
+        empty.classList.remove('hidden');
+        grid.classList.add('hidden');
+      } else {
+        empty.classList.add('hidden');
+        grid.classList.remove('hidden');
+        grid.innerHTML = savedTrips.map(item => `
+          <div class="glass-input-box p-3 sm:p-4 rounded-2xl sm:rounded-3xl flex items-center justify-between hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+            <div class="min-w-0 flex-1 pr-2 sm:pr-4">
+              <p class="text-xs sm:text-sm font-bold text-[var(--text-main)] truncate">${item.origin} → ${item.destination}</p>
+              <p class="text-[10px] sm:text-xs font-medium text-[var(--text-muted)] mt-0.5 sm:mt-1 flex items-center gap-1">
+                <i data-lucide="route" class="w-3 h-3 text-cyan-500"></i> ${item.distance} km • ${item.date}
+              </p>
+            </div>
+            <button onclick="quickRoute('${item.origin.replace(/'/g, "\\'")}', '${item.destination.replace(/'/g, "\\'")}')"
+              class="p-2 sm:p-3 rounded-[14px] sm:rounded-2xl bg-cyan-500/10 text-cyan-500 hover:bg-cyan-500/20 hover:scale-105 transition-all border border-cyan-500/20">
+              <i data-lucide="arrow-up-right" class="w-4 h-4 sm:w-5 sm:h-5"></i>
+            </button>
+          </div>
+        `).join('');
+        lucide.createIcons();
+      }
+    }
+
+    function quickRoute(orig, dest) {
+      document.getElementById('route-origin').value = orig;
+      document.getElementById('route-destination').value = dest;
+      navigateTo('plan');
+      calculateTrip();
+    }
+
+    // --- NAVIGATION & UTILS ---
+    function navigateTo(view) {
+      ['home', 'plan', 'saved'].forEach(v => {
+        const el = document.getElementById(`view-${v}`);
+        const btn = document.getElementById(`nav-btn-${v}`);
+        if (v === view) {
+          el.classList.remove('hidden');
+          if (btn) {
+            btn.classList.add('bg-black/10', 'dark:bg-white/15', 'text-[var(--brand-blue)]');
+            btn.classList.remove('text-[var(--text-muted)]');
+          }
+        } else {
+          el.classList.add('hidden');
+          if (btn) {
+            btn.classList.remove('bg-black/10', 'dark:bg-white/15', 'text-[var(--brand-blue)]');
+            btn.classList.add('text-[var(--text-muted)]');
+          }
+        }
+      });
+      if (view === 'plan' && baseMap) setTimeout(() => baseMap.invalidateSize(), 150);
+    }
+
+    function toggleAppearanceMode() {
+      appSettings.isDarkMode = !appSettings.isDarkMode;
+      document.documentElement.classList.toggle('dark-mode', appSettings.isDarkMode);
+      window.dispatchToast(appSettings.isDarkMode ? "Cyber Dark Mode" : "Daylight Mode");
+    }
+
+    function createPinIcon(bgColor, iconType) {
+      let svg = '';
+      if (iconType === 'play') svg = `<svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-white ml-0.5" viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>`;
+      else if (iconType === 'flag') svg = `<svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-white stroke-white" stroke-width="2" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line></svg>`;
+      else svg = `<svg class="w-4 h-4 sm:w-4.5 sm:h-4.5 stroke-white fill-none" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>`;
+
+      return L.divIcon({
+        className: 'bg-transparent',
+        html: `
+          <div style="background:${bgColor};" class="w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 sm:border-[2.5px] border-white shadow-[0_5px_15px_rgba(0,0,0,0.5)] flex items-center justify-center text-white">
+            ${svg}
+          </div>
+        `,
+        iconSize: window.innerWidth < 640 ? [28, 28] : [32, 32],
+        iconAnchor: window.innerWidth < 640 ? [14, 28] : [16, 32]
+      });
+    }
+
+    // Attach dispatchToast to window so module can access it
+    window.dispatchToast = function (msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-msg').innerText = msg;
+      toast.classList.remove('-translate-y-24', 'opacity-0', 'pointer-events-none');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('-translate-y-24', 'opacity-0', 'pointer-events-none');
+      }, 2500);
+    };
+  </script>
+</body>
+
+</html>
