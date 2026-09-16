@@ -7,7 +7,7 @@
     content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Oasis-trips — Visual Journey Planner</title>
 
-  <!-- High-Speed DNS Prefetch & Zero-Key CDNs -->
+  <!-- High-Speed DNS Prefetch & CDNs[cite: 1] -->
   <link rel="dns-prefetch" href="//cartocdn.com">
   <link rel="dns-prefetch" href="//server.arcgisonline.com">
   <link rel="dns-prefetch" href="//nominatim.openstreetmap.org">
@@ -15,14 +15,14 @@
   <link rel="dns-prefetch" href="//en.wikipedia.org">
   <link rel="preconnect" href="https://unpkg.com" crossorigin>
 
-  <!-- Tailwind CSS -->
+  <!-- Tailwind CSS[cite: 1] -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Leaflet CSS & JS -->
+  <!-- Leaflet CSS & JS[cite: 1] -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-  <!-- Lucide Icons -->
+  <!-- Lucide Icons[cite: 1] -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <style>
@@ -72,12 +72,12 @@
       height: 100dvh;
     }
 
-    /* Ultra Crystal-Clear Liquid Glass */
+    /* Ultra Crystal-Clear Liquid Glass[cite: 1] */
     .liquid-glass {
       background: var(--glass-base);
       background-image: var(--glass-gradient);
-      backdrop-filter: blur(26px) saturate(190%);
-      -webkit-backdrop-filter: blur(26px) saturate(190%);
+      backdrop-filter: blur(5px) saturate(200%);
+      -webkit-backdrop-filter: blur(5px) saturate(200%);
       box-shadow: var(--glass-shadow), var(--glass-inner-light);
       border: 1px solid var(--glass-border);
       position: relative;
@@ -128,7 +128,11 @@
       background: linear-gradient(135deg, rgba(41, 151, 255, 0.98) 0%, rgba(0, 242, 254, 0.98) 100%);
     }
 
-    /* Translucent Crystal Toggles */
+    .liquid-button:active {
+      transform: scale(0.98);
+    }
+
+    /* Translucent Crystal Toggles[cite: 1] */
     .crystal-toggle {
       transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
       backdrop-filter: blur(10px);
@@ -137,7 +141,7 @@
       border: 1px solid rgba(255, 255, 255, 0.18);
     }
 
-    /* Morphing Ambient Glow Blobs */
+    /* Morphing Ambient Glow Blobs[cite: 1] */
     .liquid-blob {
       position: fixed;
       border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
@@ -178,7 +182,6 @@
       animation: morph-blob-1 22s ease-in-out infinite alternate-reverse;
     }
 
-    /* Shimmer Effect */
     @keyframes liquid-shimmer {
       0% {
         transform: translateX(-150%) skewX(-15deg);
@@ -225,7 +228,7 @@
       background-clip: text;
     }
 
-    /* Pulse Beacon */
+    /* Pulse Beacon[cite: 1] */
     .gps-hud-beacon {
       width: 26px;
       height: 26px;
@@ -268,6 +271,31 @@
       }
     }
 
+    /* Interactive Transitions & Animation Classes */
+    .view-transition {
+      animation: viewFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes viewFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .modal-backdrop-anim {
+      transition: opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .modal-box-anim {
+      transition: transform 0.32s cubic-bezier(0.34, 1.4, 0.64, 1), opacity 0.25s ease;
+    }
+
     .leaflet-container {
       background: #05070e !important;
     }
@@ -282,7 +310,7 @@
 
 <body class="min-h-[100dvh] flex flex-col relative select-none">
 
-  <!-- Ambient Light Fields -->
+  <!-- Ambient Light Fields[cite: 1] -->
   <div
     class="liquid-blob blob-1 -top-24 -left-20 w-[420px] h-[420px] sm:w-[620px] sm:h-[620px] bg-gradient-to-tr from-cyan-400/30 to-blue-600/40">
   </div>
@@ -290,13 +318,13 @@
     class="liquid-blob blob-2 top-1/4 -right-20 w-[420px] h-[420px] sm:w-[680px] sm:h-[680px] bg-gradient-to-tr from-blue-500/25 to-purple-600/30">
   </div>
 
-  <!-- FLOATING APP HEADER -->
+  <!-- FLOATING APP HEADER[cite: 1] -->
   <header
     class="fixed top-3 sm:top-5 left-3 right-3 sm:left-5 sm:right-5 z-[500] pointer-events-none flex items-center justify-between">
     <div
       class="pointer-events-auto liquid-glass rounded-[24px] sm:rounded-[28px] px-3 py-2 sm:px-4 sm:py-2.5 flex items-center gap-2 sm:gap-4 shadow-2xl">
 
-      <!-- Brand Logo -->
+      <!-- Brand Logo[cite: 1] -->
       <div class="flex items-center gap-2.5 cursor-pointer group" onclick="navigateTo('home')">
         <div
           class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-cyan-400 via-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/40 group-hover:scale-105 transition-transform duration-300">
@@ -314,33 +342,43 @@
 
       <div class="h-5 w-px bg-white/15 mx-0 sm:mx-1"></div>
 
-      <!-- Navigation Segment -->
+      <!-- Navigation Segment Across All Tabs -->
       <nav class="flex items-center gap-0.5 sm:gap-1 text-[11px] sm:text-[13px] font-bold">
         <button id="nav-btn-home" onclick="navigateTo('home')"
-          class="px-2.5 sm:px-3.5 py-1.5 rounded-xl sm:rounded-2xl bg-black/10 dark:bg-white/15 text-[var(--brand-blue)] transition-all flex gap-1 items-center">
-          <i data-lucide="home" class="w-3.5 h-3.5 sm:hidden"></i>
+          class="px-2.5 sm:px-3.5 py-1.5 rounded-xl sm:rounded-2xl bg-black/10 dark:bg-white/15 text-[var(--brand-blue)] transition-all duration-200 flex gap-1.5 items-center">
+          <i data-lucide="compass" class="w-3.5 h-3.5"></i>
           <span class="hidden sm:inline">Explore</span>
         </button>
         <button id="nav-btn-plan" onclick="navigateTo('plan')"
-          class="px-2.5 sm:px-3.5 py-1.5 rounded-xl sm:rounded-2xl text-[var(--text-muted)] hover:text-[var(--text-main)] transition-all flex gap-1 items-center">
-          <i data-lucide="map" class="w-3.5 h-3.5 sm:hidden"></i>
+          class="px-2.5 sm:px-3.5 py-1.5 rounded-xl sm:rounded-2xl text-[var(--text-muted)] hover:text-[var(--text-main)] transition-all duration-200 flex gap-1.5 items-center">
+          <i data-lucide="navigation-2" class="w-3.5 h-3.5"></i>
           <span class="hidden sm:inline">Directions</span>
         </button>
+        <button id="nav-btn-nearby" onclick="navigateTo('nearby')"
+          class="px-2.5 sm:px-3.5 py-1.5 rounded-xl sm:rounded-2xl text-[var(--text-muted)] hover:text-[var(--text-main)] transition-all duration-200 flex gap-1.5 items-center">
+          <i data-lucide="radar" class="w-3.5 h-3.5"></i>
+          <span class="hidden md:inline">Nearby</span>
+        </button>
+        <button id="nav-btn-insights" onclick="navigateTo('insights')"
+          class="px-2.5 sm:px-3.5 py-1.5 rounded-xl sm:rounded-2xl text-[var(--text-muted)] hover:text-[var(--text-main)] transition-all duration-200 flex gap-1.5 items-center">
+          <i data-lucide="activity" class="w-3.5 h-3.5"></i>
+          <span class="hidden md:inline">Insights</span>
+        </button>
         <button id="nav-btn-saved" onclick="navigateTo('saved')"
-          class="px-2.5 sm:px-3.5 py-1.5 rounded-xl sm:rounded-2xl text-[var(--text-muted)] hover:text-[var(--text-main)] transition-all flex gap-1 items-center">
-          <i data-lucide="bookmark" class="w-3.5 h-3.5 sm:hidden"></i>
+          class="px-2.5 sm:px-3.5 py-1.5 rounded-xl sm:rounded-2xl text-[var(--text-muted)] hover:text-[var(--text-main)] transition-all duration-200 flex gap-1.5 items-center">
+          <i data-lucide="bookmark" class="w-3.5 h-3.5"></i>
           <span class="hidden sm:inline">Bookmarks</span>
         </button>
       </nav>
     </div>
 
-    <!-- Quick Tools: Settings, Auth & Theme -->
+    <!-- Quick Tools: Settings, Auth & Theme[cite: 1] -->
     <div class="pointer-events-auto flex items-center gap-1.5 sm:gap-2">
       <div class="liquid-glass rounded-[20px] sm:rounded-[24px] p-1 sm:p-1.5 flex items-center shadow-2xl gap-0.5">
 
-        <!-- Auth Profile Trigger -->
+        <!-- Auth Profile Trigger[cite: 1] -->
         <button id="auth-btn" onclick="openAuthOrAccount()"
-          class="p-2 sm:p-2.5 rounded-xl sm:rounded-[20px] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-black/10 dark:hover:bg-white/10 transition-all flex items-center justify-center relative"
+          class="p-2 sm:p-2.5 rounded-xl sm:rounded-[20px] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-black/10 dark:hover:bg-white/10 transition-all flex items-center justify-center relative active:scale-95"
           title="Account / Sign In">
           <div id="auth-user-icon-slot">
             <i data-lucide="user" class="w-4 h-4 sm:w-5 sm:h-5"></i>
@@ -350,13 +388,13 @@
         </button>
 
         <button onclick="toggleSettingsModal()"
-          class="p-2 sm:p-2.5 rounded-xl sm:rounded-[20px] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-black/10 dark:hover:bg-white/10 transition-all"
-          title="Trip Preferences">
+          class="p-2 sm:p-2.5 rounded-xl sm:rounded-[20px] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-black/10 dark:hover:bg-white/10 transition-all active:scale-95"
+          title="Trip Preferences & Settings">
           <i data-lucide="sliders" class="w-4 h-4 sm:w-5 sm:h-5"></i>
         </button>
 
         <button onclick="toggleAppearanceMode()"
-          class="p-2 sm:p-2.5 rounded-xl sm:rounded-[20px] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-black/10 dark:hover:bg-white/10 transition-all"
+          class="p-2 sm:p-2.5 rounded-xl sm:rounded-[20px] text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-black/10 dark:hover:bg-white/10 transition-all active:scale-95"
           title="Toggle Color Mode">
           <i data-lucide="sun-medium" class="w-4 h-4 sm:w-5 sm:h-5" id="theme-toggle-icon"></i>
         </button>
@@ -364,7 +402,7 @@
     </div>
   </header>
 
-  <!-- TOAST ALERTS -->
+  <!-- TOAST ALERTS[cite: 1] -->
   <div id="toast"
     class="fixed top-20 sm:top-24 left-1/2 -translate-x-1/2 z-[1100] liquid-glass px-4 sm:px-5 py-2.5 sm:py-3 rounded-3xl flex items-center gap-2.5 transition-all duration-300 transform -translate-y-24 opacity-0 pointer-events-none shadow-2xl w-max max-w-[90vw]">
     <div class="p-1 sm:p-1.5 rounded-full bg-cyan-500/20 text-cyan-400 relative z-10 shrink-0">
@@ -374,11 +412,11 @@
       class="text-xs sm:text-sm font-bold tracking-tight text-[var(--text-main)] relative z-10 truncate"></span>
   </div>
 
-  <!-- MODAL 1: SIGN IN / REGISTER PAGE -->
+  <!-- MODAL 1: SIGN IN / REGISTER (FIREBASE ENGINE)[cite: 1] -->
   <div id="signin-modal"
-    class="fixed inset-0 z-[1000] bg-black/50 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity duration-300">
+    class="fixed inset-0 z-[1000] bg-black/50 backdrop-blur-sm hidden items-center justify-center p-4 modal-backdrop-anim opacity-0 pointer-events-none">
     <div
-      class="liquid-glass w-full max-w-md rounded-[32px] sm:rounded-[36px] p-6 sm:p-8 shadow-2xl space-y-6 transform transition-transform duration-300 scale-95"
+      class="liquid-glass w-full max-w-md rounded-[32px] sm:rounded-[36px] p-6 sm:p-8 shadow-2xl space-y-6 transform scale-95 opacity-0 modal-box-anim"
       id="signin-content">
 
       <div class="flex items-center justify-between pb-3 border-b border-black/10 dark:border-white/10">
@@ -388,8 +426,8 @@
             <i data-lucide="log-in" class="w-5 h-5"></i>
           </div>
           <div>
-            <h3 class="text-base sm:text-lg font-bold text-[var(--text-main)]">Sign In to Oasis</h3>
-            <p class="text-[11px] text-[var(--text-muted)]">Sync your routes across all devices</p>
+            <h3 id="auth-title" class="text-base sm:text-lg font-bold text-[var(--text-main)]">Sign In to Oasis</h3>
+            <p class="text-[11px] text-[var(--text-muted)]">Synchronize journeys across all your devices</p>
           </div>
         </div>
         <button onclick="closeAuthModal()"
@@ -398,8 +436,8 @@
         </button>
       </div>
 
-      <!-- Google Sign In Button -->
-      <div class="space-y-3 pt-2">
+      <!-- Google Sign In Button[cite: 1] -->
+      <div class="space-y-3 pt-1">
         <button onclick="triggerGoogleSignIn()"
           class="w-full py-3.5 px-4 rounded-2xl liquid-glass hover:bg-white/10 flex items-center justify-center gap-3 transition-all border border-white/20 shadow-md group">
           <svg class="w-5 h-5" viewBox="0 0 24 24">
@@ -417,14 +455,14 @@
             with Google</span>
         </button>
 
-        <div class="flex items-center gap-3 my-3">
+        <div class="flex items-center gap-3 my-2.5">
           <div class="h-px bg-black/10 dark:bg-white/10 flex-1"></div>
           <span class="text-[10px] uppercase font-bold text-[var(--text-muted)] tracking-wider">or sign in with
             email</span>
           <div class="h-px bg-black/10 dark:bg-white/10 flex-1"></div>
         </div>
 
-        <!-- Email & Password Form -->
+        <!-- Email & Password Form[cite: 1] -->
         <form onsubmit="handleEmailSignIn(event)" class="space-y-2.5">
           <div class="glass-input-box rounded-2xl px-3.5 py-2.5 flex items-center gap-2.5">
             <i data-lucide="mail" class="w-4 h-4 text-[var(--text-muted)]"></i>
@@ -439,37 +477,35 @@
               required />
           </div>
           <button type="submit"
-            class="liquid-button w-full text-white font-bold py-3 rounded-2xl text-xs sm:text-sm transition-all flex items-center justify-center gap-2 mt-2">
+            class="liquid-button w-full text-white font-bold py-3 rounded-2xl text-xs sm:text-sm transition-all flex items-center justify-center gap-2 mt-1">
             Sign In with Email
           </button>
         </form>
 
         <button onclick="continueAsGuest()"
-          class="w-full py-2.5 text-[11px] font-semibold text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors text-center block">
+          class="w-full py-2 text-[11px] font-semibold text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors text-center block">
           Continue as Guest Explorer
         </button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL 2: USER ACCOUNT PROFILE (WHEN SIGNED IN) -->
+  <!-- MODAL 2: USER ACCOUNT PROFILE[cite: 1] -->
   <div id="account-modal"
-    class="fixed inset-0 z-[1000] bg-black/50 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity duration-300">
+    class="fixed inset-0 z-[1000] bg-black/50 backdrop-blur-sm hidden items-center justify-center p-4 modal-backdrop-anim opacity-0 pointer-events-none">
     <div
-      class="liquid-glass w-full max-w-md rounded-[32px] sm:rounded-[36px] p-6 sm:p-8 shadow-2xl space-y-6 transform transition-transform duration-300 scale-95"
+      class="liquid-glass w-full max-w-md rounded-[32px] sm:rounded-[36px] p-6 sm:p-8 shadow-2xl space-y-6 transform scale-95 opacity-0 modal-box-anim"
       id="account-content">
 
       <div class="flex items-center justify-between pb-3 border-b border-black/10 dark:border-white/10">
-        <div class="flex items-center gap-2">
-          <span class="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">Explorer Profile</span>
-        </div>
+        <span class="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)]">Explorer Profile</span>
         <button onclick="closeAccountModal()"
           class="p-2 rounded-full hover:bg-black/10 dark:hover:bg-white/10 text-[var(--text-muted)] transition-colors">
           <i data-lucide="x" class="w-4 h-4 sm:w-5 sm:h-5"></i>
         </button>
       </div>
 
-      <!-- User Card -->
+      <!-- User Card[cite: 1] -->
       <div class="flex items-center gap-4 p-4 rounded-3xl glass-input-box">
         <img id="account-avatar" src="" alt="Avatar"
           class="w-14 h-14 rounded-2xl object-cover border-2 border-cyan-400 shadow-md" />
@@ -483,7 +519,7 @@
         </div>
       </div>
 
-      <!-- Stats Grid -->
+      <!-- Stats Grid[cite: 1] -->
       <div class="grid grid-cols-2 gap-3">
         <div class="glass-input-box p-3.5 rounded-2xl text-center">
           <span class="text-[10px] uppercase font-bold text-[var(--text-muted)]">Saved Trips</span>
@@ -495,8 +531,7 @@
         </div>
       </div>
 
-      <!-- Account Actions -->
-      <div class="space-y-2 pt-2">
+      <div class="space-y-2 pt-1">
         <button onclick="navigateTo('saved'); closeAccountModal();"
           class="w-full py-3 px-4 rounded-2xl glass-input-box text-xs sm:text-sm font-bold text-[var(--text-main)] hover:bg-black/5 dark:hover:bg-white/10 flex items-center justify-between transition-all">
           <span class="flex items-center gap-2.5"><i data-lucide="bookmark" class="w-4 h-4 text-cyan-400"></i> View
@@ -512,14 +547,15 @@
     </div>
   </div>
 
-  <!-- MODAL 3: PREFERENCES & SETTINGS (CRYSTAL GLASS TOGGLES) -->
+  <!-- MODAL 3: PREFERENCES & SETTINGS (FIXED PADDINGS, POSITIONS & ANIMATIONS)[cite: 1] -->
   <div id="settings-modal"
-    class="fixed inset-0 z-[1000] bg-black/50 backdrop-blur-sm hidden items-center justify-center p-4 transition-opacity duration-300">
+    class="fixed inset-0 z-[1000] bg-black/50 backdrop-blur-sm hidden items-center justify-center p-4 modal-backdrop-anim opacity-0 pointer-events-none">
     <div
-      class="liquid-glass w-full max-w-md rounded-[32px] sm:rounded-[36px] p-6 sm:p-8 shadow-2xl space-y-5 sm:space-y-6 transform transition-transform duration-300 scale-95"
+      class="liquid-glass w-full max-w-md rounded-[32px] sm:rounded-[36px] p-6 sm:p-7 shadow-2xl space-y-4 sm:space-y-5 transform scale-95 opacity-0 modal-box-anim max-h-[90dvh] flex flex-col"
       id="settings-content">
 
-      <div class="flex items-center justify-between pb-3 border-b border-black/10 dark:border-white/10">
+      <!-- Header Section[cite: 1] -->
+      <div class="flex items-center justify-between pb-3 border-b border-black/10 dark:border-white/10 shrink-0">
         <div class="flex items-center gap-3">
           <div
             class="p-2 sm:p-2.5 rounded-xl sm:rounded-2xl bg-gradient-to-br from-blue-500/10 to-cyan-500/20 text-cyan-400 border border-cyan-500/20">
@@ -531,31 +567,45 @@
           </div>
         </div>
         <button onclick="toggleSettingsModal()"
-          class="p-2 rounded-full hover:bg-black/10 dark:hover:bg-white/10 text-[var(--text-muted)] transition-colors">
+          class="p-2 rounded-full hover:bg-black/10 dark:hover:bg-white/10 text-[var(--text-muted)] transition-colors active:scale-95">
           <i data-lucide="x" class="w-4 h-4 sm:w-5 sm:h-5"></i>
         </button>
       </div>
 
-      <div class="space-y-4 text-sm font-medium mt-3">
-        <!-- Units Toggle -->
-        <div class="flex items-center justify-between">
+      <!-- Settings Sub-Navigation -->
+      <div
+        class="flex p-1 rounded-2xl bg-black/10 dark:bg-black/30 border border-black/5 dark:border-white/10 shrink-0 gap-1">
+        <button id="set-tab-general" onclick="switchSettingsTab('general')"
+          class="flex-1 py-1.5 text-xs font-bold rounded-xl bg-black/10 dark:bg-white/15 text-cyan-400 shadow-sm transition-all duration-200">
+          Navigation
+        </button>
+        <button id="set-tab-privacy" onclick="switchSettingsTab('privacy')"
+          class="flex-1 py-1.5 text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--text-main)] transition-all duration-200">
+          Privacy
+        </button>
+      </div>
+
+      <!-- Tab 1: Navigation Parameters (Preserved Original Settings)[cite: 1] -->
+      <div id="section-settings-general" class="space-y-3.5 overflow-y-auto pr-1 flex-1">
+        <!-- Units Toggle[cite: 1] -->
+        <div class="flex items-center justify-between p-3 rounded-2xl glass-input-box">
           <div>
-            <p class="text-[var(--text-main)] font-bold text-sm">Distance Units</p>
+            <p class="text-[var(--text-main)] font-bold text-xs sm:text-sm">Distance Units</p>
             <p class="text-[10px] sm:text-[11px] text-[var(--text-muted)] mt-0.5">Kilometers or Miles</p>
           </div>
           <div
             class="flex bg-black/10 dark:bg-black/30 border border-black/5 dark:border-white/10 p-1 rounded-xl shadow-inner">
             <button onclick="setUnits('km')" id="unit-km-btn"
-              class="px-3.5 py-1 rounded-lg text-xs font-bold bg-[var(--brand-blue)] text-white shadow-sm">KM</button>
+              class="px-3.5 py-1 rounded-lg text-xs font-bold bg-[var(--brand-blue)] text-white shadow-sm transition-all duration-200">KM</button>
             <button onclick="setUnits('mi')" id="unit-mi-btn"
-              class="px-3.5 py-1 rounded-lg text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--text-main)]">Miles</button>
+              class="px-3.5 py-1 rounded-lg text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--text-main)] transition-all duration-200">Miles</button>
           </div>
         </div>
 
-        <!-- Satellite Hybrid Road Labels Toggle -->
-        <div class="flex items-center justify-between">
+        <!-- Satellite Hybrid Road Labels Toggle[cite: 1] -->
+        <div class="flex items-center justify-between p-3 rounded-2xl glass-input-box">
           <div>
-            <p class="text-[var(--text-main)] font-bold text-sm">Satellite Road Labels</p>
+            <p class="text-[var(--text-main)] font-bold text-xs sm:text-sm">Satellite Road Labels</p>
             <p class="text-[10px] sm:text-[11px] text-[var(--text-muted)] mt-0.5">Show highways & boundaries</p>
           </div>
           <label class="relative inline-flex items-center cursor-pointer">
@@ -567,10 +617,10 @@
           </label>
         </div>
 
-        <!-- High Accuracy GPS -->
-        <div class="flex items-center justify-between">
+        <!-- High Accuracy GPS[cite: 1] -->
+        <div class="flex items-center justify-between p-3 rounded-2xl glass-input-box">
           <div>
-            <p class="text-[var(--text-main)] font-bold text-sm">High-Precision GPS</p>
+            <p class="text-[var(--text-main)] font-bold text-xs sm:text-sm">High-Precision GPS</p>
             <p class="text-[10px] sm:text-[11px] text-[var(--text-muted)] mt-0.5">Continuous telemetry lock</p>
           </div>
           <label class="relative inline-flex items-center cursor-pointer">
@@ -582,10 +632,10 @@
           </label>
         </div>
 
-        <!-- Turn-by-Turn Audio Prompt -->
-        <div class="flex items-center justify-between">
+        <!-- Turn-by-Turn Audio Prompt[cite: 1] -->
+        <div class="flex items-center justify-between p-3 rounded-2xl glass-input-box">
           <div>
-            <p class="text-[var(--text-main)] font-bold text-sm">Voice Synthesis</p>
+            <p class="text-[var(--text-main)] font-bold text-xs sm:text-sm">Voice Synthesis</p>
             <p class="text-[10px] sm:text-[11px] text-[var(--text-muted)] mt-0.5">Read next directional maneuver</p>
           </div>
           <label class="relative inline-flex items-center cursor-pointer">
@@ -596,10 +646,10 @@
           </label>
         </div>
 
-        <!-- Data Saver -->
-        <div class="flex items-center justify-between">
+        <!-- Data Saver[cite: 1] -->
+        <div class="flex items-center justify-between p-3 rounded-2xl glass-input-box">
           <div>
-            <p class="text-[var(--text-main)] font-bold text-sm">Data Saver Speed</p>
+            <p class="text-[var(--text-main)] font-bold text-xs sm:text-sm">Data Saver Speed</p>
             <p class="text-[10px] sm:text-[11px] text-[var(--text-muted)] mt-0.5">Zero lag vector caching</p>
           </div>
           <span
@@ -608,32 +658,83 @@
         </div>
       </div>
 
-      <div class="pt-4">
+      <!-- Tab 2: Privacy & Data Security -->
+      <div id="section-settings-privacy" class="hidden space-y-3.5 overflow-y-auto pr-1 flex-1">
+        <div class="flex items-center justify-between p-3 rounded-2xl glass-input-box">
+          <div>
+            <p class="text-[var(--text-main)] font-bold text-xs sm:text-sm flex items-center gap-1.5">
+              <i data-lucide="shield-check" class="w-3.5 h-3.5 text-cyan-400"></i> Incognito Navigation
+            </p>
+            <p class="text-[10px] sm:text-[11px] text-[var(--text-muted)] mt-0.5">Disable logging of searched locations
+            </p>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="setting-incognito" onchange="toggleIncognito(this.checked)" class="sr-only peer">
+            <div
+              class="crystal-toggle w-11 h-6 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white/90 after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500/60 peer-checked:border-cyan-400/80">
+            </div>
+          </label>
+        </div>
+
+        <div class="flex items-center justify-between p-3 rounded-2xl glass-input-box">
+          <div>
+            <p class="text-[var(--text-main)] font-bold text-xs sm:text-sm flex items-center gap-1.5">
+              <i data-lucide="eye-off" class="w-3.5 h-3.5 text-cyan-400"></i> Mask Telemetry
+            </p>
+            <p class="text-[10px] sm:text-[11px] text-[var(--text-muted)] mt-0.5">Truncate coordinates to protect exact
+              position</p>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="setting-anonymize-coords" onchange="toggleAnonymize(this.checked)"
+              class="sr-only peer">
+            <div
+              class="crystal-toggle w-11 h-6 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white/90 after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-cyan-500/60 peer-checked:border-cyan-400/80">
+            </div>
+          </label>
+        </div>
+
+        <button onclick="clearSearchHistoryCache()"
+          class="w-full py-3 px-4 rounded-2xl glass-input-box text-xs font-bold text-[var(--text-main)] hover:text-cyan-400 flex items-center justify-between transition-colors">
+          <span class="flex items-center gap-2"><i data-lucide="eraser" class="w-4 h-4 text-cyan-400"></i> Clear Search
+            Autocomplete Cache</span>
+          <span class="text-[10px] text-[var(--text-muted)] font-semibold">Instant</span>
+        </button>
+
+        <button onclick="wipeAllUserData()"
+          class="w-full py-3 px-4 rounded-2xl bg-rose-500/15 hover:bg-rose-500/25 border border-rose-500/20 text-rose-500 text-xs font-bold flex items-center justify-between transition-colors">
+          <span class="flex items-center gap-2"><i data-lucide="trash-2" class="w-4 h-4"></i> Purge All Bookmarked
+            Expeditions</span>
+          <span class="text-[10px] text-rose-400 font-semibold">Permanent</span>
+        </button>
+      </div>
+
+      <!-- Action Button[cite: 1] -->
+      <div class="pt-2 shrink-0">
         <button onclick="toggleSettingsModal()"
-          class="liquid-button w-full text-white font-bold py-3 sm:py-3.5 rounded-2xl text-sm transition-all flex items-center justify-center gap-2">
+          class="liquid-button w-full text-white font-bold py-3 sm:py-3.5 rounded-2xl text-xs sm:text-sm transition-all flex items-center justify-center gap-2">
           Apply Preferences
         </button>
       </div>
     </div>
   </div>
 
-  <!-- MAIN VIEW CONTAINER -->
+  <!-- MAIN VIEW CONTAINER[cite: 1] -->
   <main class="flex-1 w-full h-full relative">
 
-    <!-- VIEW 1: HOME DISCOVERY -->
+    <!-- VIEW 1: HOME DISCOVERY[cite: 1] -->
     <section id="view-home"
-      class="absolute inset-0 z-20 flex flex-col items-center justify-center px-4 pt-20 pb-8 sm:pt-24 overflow-y-auto pointer-events-none">
+      class="view-transition absolute inset-0 z-20 flex flex-col items-center justify-center px-4 pt-20 pb-8 sm:pt-24 overflow-y-auto pointer-events-none">
 
       <div class="w-full max-w-2xl pointer-events-auto space-y-6 sm:space-y-8 text-center animate-float">
 
-        <!-- Scope Badge -->
+        <!-- Scope Badge[cite: 1] -->
         <div
           class="inline-flex items-center gap-2 liquid-glass shimmer-liquid px-4 py-1.5 rounded-full text-[10px] sm:text-xs font-bold text-[var(--text-main)] shadow-2xl">
           <span class="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_8px_#00f2fe] animate-pulse"></span>
           100% Free & Open-Source GIS Engine
         </div>
 
-        <!-- Title -->
+        <!-- Title[cite: 1] -->
         <div class="space-y-2 sm:space-y-3 px-2">
           <h1
             class="text-4xl sm:text-5xl md:text-6xl font-black tracking-tighter text-[var(--text-main)] drop-shadow-lg leading-tight">
@@ -645,7 +746,7 @@
           </p>
         </div>
 
-        <!-- Liquid Search Command Deck -->
+        <!-- Liquid Search Command Deck[cite: 1] -->
         <div
           class="liquid-glass p-4 sm:p-5 rounded-[32px] sm:rounded-[40px] text-left shadow-2xl relative mx-auto w-full">
           <div class="flex items-center gap-2 mb-3 sm:mb-4 px-1 sm:px-2">
@@ -657,7 +758,7 @@
           </div>
 
           <form onsubmit="initiateRouteFromHome(event)" class="space-y-2.5 sm:space-y-3">
-            <!-- Origin Input -->
+            <!-- Origin Input[cite: 1] -->
             <div class="relative">
               <div
                 class="glass-input-box rounded-2xl sm:rounded-3xl px-3 sm:px-4 py-2.5 sm:py-3.5 flex items-center gap-2 sm:gap-3">
@@ -667,8 +768,8 @@
                   class="bg-transparent outline-none w-full text-[var(--text-main)] placeholder:text-[var(--text-muted)] font-semibold"
                   autocomplete="off" required />
                 <button type="button" onclick="loadMyCurrentGPSLocation('home-origin-input')"
-                  class="p-1.5 rounded-xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10 text-[var(--text-muted)] hover:text-cyan-400 transition-all"
-                  title="Acquire My GPS Location">
+                  class="p-1.5 rounded-xl bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10 text-[var(--text-muted)] hover:text-cyan-400 transition-all active:scale-95"
+                  title="Detect My GPS Location">
                   <i data-lucide="locate" class="w-3.5 h-3.5 sm:w-4 sm:h-4"></i>
                 </button>
               </div>
@@ -678,7 +779,7 @@
               </div>
             </div>
 
-            <!-- Destination Input -->
+            <!-- Destination Input[cite: 1] -->
             <div class="relative">
               <div
                 class="glass-input-box rounded-2xl sm:rounded-3xl px-3 sm:px-4 py-2.5 sm:py-3.5 flex items-center gap-2 sm:gap-3">
@@ -695,14 +796,14 @@
             </div>
 
             <button type="submit"
-              class="liquid-button w-full text-white font-bold text-xs sm:text-sm py-3 sm:py-4 rounded-2xl sm:rounded-3xl mt-1 sm:mt-2 flex items-center justify-center gap-2">
+              class="liquid-button w-full text-white font-bold text-xs sm:text-sm py-3.5 sm:py-4 rounded-2xl sm:rounded-3xl mt-1 sm:mt-2 flex items-center justify-center gap-2">
               <i data-lucide="navigation" class="w-4 h-4 fill-white"></i> Calculate Express Route
             </button>
           </form>
         </div>
 
-        <!-- Trending Heritage & Wonders -->
-        <div class="text-left space-y-2 sm:space-y-3 pt-2">
+        <!-- Trending Locations[cite: 1] -->
+        <div class="text-left space-y-2.5 pt-2">
           <div class="flex items-center justify-between px-2">
             <span class="text-[10px] sm:text-xs font-bold text-[var(--text-muted)] uppercase tracking-widest">Trending
               Locations</span>
@@ -713,37 +814,37 @@
       </div>
     </section>
 
-    <!-- VIEW 2: MAP CANVAS & DIRECTIONS DRAWER -->
+    <!-- VIEW 2: MAP CANVAS & DIRECTIONS DRAWER[cite: 1] -->
     <section id="view-plan" class="hidden w-full h-full relative">
       <div id="leaflet-main-map" class="w-full h-full absolute inset-0 z-0"></div>
 
-      <!-- MAP FLOATING ACTION BUTTONS -->
+      <!-- MAP FLOATING ACTION BUTTONS[cite: 1] -->
       <div class="absolute top-20 sm:top-24 right-3 sm:right-5 z-[400] flex flex-col gap-2 sm:gap-3">
         <button onclick="toggleRealtimeGPSLock()" id="btn-gps-lock"
-          class="liquid-glass p-2.5 sm:p-3.5 rounded-[18px] sm:rounded-2xl text-[var(--text-main)] hover:text-cyan-400 shadow-lg transition-all"
+          class="liquid-glass p-2.5 sm:p-3.5 rounded-[18px] sm:rounded-2xl text-[var(--text-main)] hover:text-cyan-400 shadow-lg transition-all active:scale-95"
           title="Current GPS Position">
           <i data-lucide="crosshair" class="w-4 h-4 sm:w-5 sm:h-5 relative z-10" id="gps-icon-indicator"></i>
         </button>
 
         <button onclick="toggleLayerMenuSelector()"
-          class="liquid-glass p-2.5 sm:p-3.5 rounded-[18px] sm:rounded-2xl text-[var(--text-main)] hover:text-cyan-400 shadow-lg transition-all"
+          class="liquid-glass p-2.5 sm:p-3.5 rounded-[18px] sm:rounded-2xl text-[var(--text-main)] hover:text-cyan-400 shadow-lg transition-all active:scale-95"
           title="Satellite & Basemaps">
           <i data-lucide="layers" class="w-4 h-4 sm:w-5 sm:h-5 relative z-10"></i>
         </button>
 
         <div class="liquid-glass rounded-[18px] sm:rounded-2xl p-1 sm:p-1.5 flex flex-col gap-1 shadow-lg">
           <button onclick="zoomMap(1)"
-            class="p-2 sm:p-2.5 text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-black/5 dark:hover:bg-white/10 rounded-xl transition-all relative z-10">
+            class="p-2 sm:p-2.5 text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-black/5 dark:hover:bg-white/10 rounded-xl transition-all relative z-10 active:scale-95">
             <i data-lucide="plus" class="w-4 h-4 sm:w-5 sm:h-5"></i>
           </button>
           <div class="h-px bg-black/10 dark:bg-white/10 mx-2 relative z-10"></div>
           <button onclick="zoomMap(-1)"
-            class="p-2 sm:p-2.5 text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-black/5 dark:hover:bg-white/10 rounded-xl transition-all relative z-10">
+            class="p-2 sm:p-2.5 text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-black/5 dark:hover:bg-white/10 rounded-xl transition-all relative z-10 active:scale-95">
             <i data-lucide="minus" class="w-4 h-4 sm:w-5 sm:h-5"></i>
           </button>
         </div>
 
-        <!-- Basemap Selection Flyout -->
+        <!-- Basemap Selection Flyout[cite: 1] -->
         <div id="layer-drawer-panel"
           class="hidden absolute right-14 sm:right-16 top-12 sm:top-16 flex flex-col gap-1 p-2.5 sm:p-3 liquid-glass rounded-2xl sm:rounded-3xl shadow-2xl z-[500] w-48 sm:w-56">
           <div class="relative z-10">
@@ -768,7 +869,7 @@
         </div>
       </div>
 
-      <!-- PLACE INSPECTOR CARD (WIKIPEDIA VISUALS) -->
+      <!-- PLACE INSPECTOR CARD[cite: 1] -->
       <div id="place-inspector-card"
         class="hidden absolute bottom-3 left-3 right-3 sm:bottom-auto sm:right-auto sm:top-24 sm:left-5 z-[450] sm:w-[340px] liquid-glass rounded-[28px] sm:rounded-[32px] overflow-hidden shadow-2xl transition-all duration-300 transform scale-95 opacity-0">
 
@@ -809,12 +910,11 @@
         </div>
       </div>
 
-      <!-- ROUTE DRAWER & TURN DIRECTIONS (MOBILE BOTTOM SHEET) -->
+      <!-- ROUTE DRAWER & TURN DIRECTIONS[cite: 1] -->
       <div id="route-panel-drawer"
         class="absolute left-0 bottom-0 w-full sm:left-5 sm:bottom-5 sm:w-[400px] sm:max-h-[80vh] h-auto max-h-[85vh] z-[300] flex flex-col liquid-glass rounded-t-[32px] sm:rounded-[36px] shadow-2xl transition-transform duration-300 transform translate-y-0 pb-[env(safe-area-inset-bottom)]">
 
         <div class="relative z-10 flex flex-col h-full max-h-[85vh]">
-          <!-- Drag Grip -->
           <div
             class="pt-3 pb-2 flex justify-center cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors shrink-0"
             onclick="toggleDrawerCollapse()">
@@ -833,7 +933,7 @@
             </div>
 
             <form onsubmit="calculateTrip(event)" class="space-y-2.5 sm:space-y-3">
-              <!-- Origin -->
+              <!-- Origin[cite: 1] -->
               <div class="relative">
                 <div class="glass-input-box rounded-xl sm:rounded-2xl px-3 sm:px-3.5 py-2 sm:py-2.5 flex items-center">
                   <i data-lucide="circle-dot" class="text-emerald-500 w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2.5 shrink-0"></i>
@@ -852,11 +952,11 @@
                 </div>
               </div>
 
-              <!-- Destination -->
+              <!-- Destination[cite: 1] -->
               <div class="relative">
                 <div class="glass-input-box rounded-xl sm:rounded-2xl px-3 sm:px-3.5 py-2 sm:py-2.5 flex items-center">
                   <i data-lucide="map-pin" class="text-rose-500 w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2.5 shrink-0"></i>
-                  <input type="text" id="route-destination" placeholder="Destination"
+                  <input type="text" id="route-destination" placeholder="Destination point"
                     oninput="handleSearchAutocomplete(this.value, 'panel-dest-suggest', 'route-destination')"
                     class="bg-transparent w-full outline-none font-semibold text-[var(--text-main)] text-xs sm:text-sm"
                     required />
@@ -867,7 +967,7 @@
                 </div>
               </div>
 
-              <!-- Transport Mode Selector -->
+              <!-- Transport Mode Selector[cite: 1] -->
               <div
                 class="grid grid-cols-3 gap-1 sm:gap-1.5 bg-black/10 dark:bg-black/30 border border-black/5 dark:border-white/10 p-1 sm:p-1.5 rounded-xl sm:rounded-2xl shadow-inner">
                 <button type="button" id="mode-drive" onclick="setTransportMode('drive')"
@@ -891,7 +991,7 @@
             </form>
           </div>
 
-          <!-- Directions Scroll -->
+          <!-- Directions Scroll[cite: 1] -->
           <div id="drawer-scroll-content" class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3 sm:space-y-4">
             <div id="panel-empty-state" class="text-center py-6 sm:py-8">
               <div
@@ -946,9 +1046,101 @@
       </div>
     </section>
 
-    <!-- VIEW 3: SAVED TRIPS ARCHIVE -->
+    <!-- VIEW 3: NEARBY PLACES RADAR TAB -->
+    <section id="view-nearby"
+      class="view-transition hidden absolute inset-0 z-20 flex justify-center items-center p-3 sm:p-6 overflow-hidden pt-20 sm:pt-24">
+      <div class="liquid-glass w-full max-w-3xl h-[85vh] rounded-[32px] sm:rounded-[40px] flex flex-col shadow-2xl">
+        <div
+          class="p-5 sm:p-6 border-b border-black/10 dark:border-white/10 flex items-center justify-between shrink-0">
+          <div>
+            <h2 class="text-xl sm:text-2xl font-black text-[var(--text-main)] flex items-center gap-2.5">
+              <i data-lucide="radar" class="text-cyan-400 w-6 h-6"></i> Nearby Places Radar
+            </h2>
+            <p class="text-xs text-[var(--text-muted)] mt-0.5">Discover amenities, dining, and transit around your
+              route.</p>
+          </div>
+          <button onclick="navigateTo('plan')"
+            class="px-3 py-1.5 rounded-xl glass-input-box text-xs font-bold text-cyan-400 hover:bg-black/5 dark:hover:bg-white/10 transition-colors">
+            Map
+          </button>
+        </div>
+
+        <div
+          class="flex items-center gap-2 p-3 sm:px-6 overflow-x-auto border-b border-black/5 dark:border-white/10 shrink-0">
+          <button onclick="filterNearbyPOIs('all')"
+            class="nearby-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-black/10 dark:bg-white/15 text-cyan-400 shrink-0 transition-all">All
+            Places</button>
+          <button onclick="filterNearbyPOIs('fuel')"
+            class="nearby-filter-btn px-3 py-1.5 rounded-xl text-xs font-medium text-[var(--text-muted)] hover:text-[var(--text-main)] shrink-0 transition-all">⛽
+            Fuel & EV</button>
+          <button onclick="filterNearbyPOIs('cafe')"
+            class="nearby-filter-btn px-3 py-1.5 rounded-xl text-xs font-medium text-[var(--text-muted)] hover:text-[var(--text-main)] shrink-0 transition-all">☕
+            Cafes</button>
+          <button onclick="filterNearbyPOIs('hotel')"
+            class="nearby-filter-btn px-3 py-1.5 rounded-xl text-xs font-medium text-[var(--text-muted)] hover:text-[var(--text-main)] shrink-0 transition-all">🏨
+            Lodging</button>
+          <button onclick="filterNearbyPOIs('sight')"
+            class="nearby-filter-btn px-3 py-1.5 rounded-xl text-xs font-medium text-[var(--text-muted)] hover:text-[var(--text-main)] shrink-0 transition-all">🏛️
+            Landmarks</button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-4 sm:p-6 space-y-3" id="nearby-cards-container"></div>
+      </div>
+    </section>
+
+    <!-- VIEW 4: TRIP INSIGHTS & ANALYTICS TAB -->
+    <section id="view-insights"
+      class="view-transition hidden absolute inset-0 z-20 flex justify-center items-center p-3 sm:p-6 overflow-hidden pt-20 sm:pt-24">
+      <div
+        class="liquid-glass w-full max-w-3xl h-[85vh] rounded-[32px] sm:rounded-[40px] flex flex-col shadow-2xl p-5 sm:p-6 overflow-y-auto space-y-5 sm:space-y-6">
+        <div>
+          <h2 class="text-xl sm:text-2xl font-black text-[var(--text-main)] flex items-center gap-2.5">
+            <i data-lucide="activity" class="text-cyan-400 w-6 h-6"></i> Journey Insights & Analytics
+          </h2>
+          <p class="text-xs text-[var(--text-muted)] mt-0.5">Telemetry summaries, trip history, and carbon footprint.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="glass-input-box p-3.5 sm:p-4 rounded-2xl text-center">
+            <span class="text-[10px] uppercase font-bold text-[var(--text-muted)]">Distance Traveled</span>
+            <p id="stat-total-distance" class="text-xl sm:text-2xl font-black text-cyan-400 mt-1">1,420 km</p>
+          </div>
+          <div class="glass-input-box p-3.5 sm:p-4 rounded-2xl text-center">
+            <span class="text-[10px] uppercase font-bold text-[var(--text-muted)]">Logged Trips</span>
+            <p id="stat-total-trips" class="text-xl sm:text-2xl font-black text-blue-400 mt-1">12</p>
+          </div>
+          <div class="glass-input-box p-3.5 sm:p-4 rounded-2xl text-center">
+            <span class="text-[10px] uppercase font-bold text-[var(--text-muted)]">CO₂ Avoided</span>
+            <p class="text-xl sm:text-2xl font-black text-emerald-400 mt-1">48.2 kg</p>
+          </div>
+          <div class="glass-input-box p-3.5 sm:p-4 rounded-2xl text-center">
+            <span class="text-[10px] uppercase font-bold text-[var(--text-muted)]">Telemetry Privacy</span>
+            <p id="stat-privacy-status" class="text-xl sm:text-2xl font-black text-purple-400 mt-1">Standard</p>
+          </div>
+        </div>
+
+        <div class="p-4 sm:p-5 rounded-3xl glass-input-box space-y-3">
+          <h4 class="text-xs sm:text-sm font-bold text-[var(--text-main)] flex items-center gap-2">
+            <i data-lucide="route" class="w-4 h-4 text-cyan-400"></i> Mode Breakdown
+          </h4>
+          <div class="w-full bg-black/20 dark:bg-black/40 rounded-full h-3 flex overflow-hidden">
+            <div style="width: 65%" class="bg-cyan-400 h-full" title="Drive (65%)"></div>
+            <div style="width: 25%" class="bg-blue-500 h-full" title="Rail (25%)"></div>
+            <div style="width: 10%" class="bg-emerald-400 h-full" title="Walk (10%)"></div>
+          </div>
+          <div class="flex justify-between text-[11px] text-[var(--text-muted)] font-semibold">
+            <span>🚗 Drive: 65%</span>
+            <span>🚆 Rail: 25%</span>
+            <span>🚶 Walk: 10%</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 5: SAVED TRIPS ARCHIVE[cite: 1] -->
     <section id="view-saved"
-      class="hidden absolute inset-0 z-20 flex justify-center items-center p-3 sm:p-6 overflow-hidden pt-20 sm:pt-24">
+      class="view-transition hidden absolute inset-0 z-20 flex justify-center items-center p-3 sm:p-6 overflow-hidden pt-20 sm:pt-24">
       <div
         class="liquid-glass w-full max-w-2xl h-[85vh] sm:h-[80vh] rounded-[32px] sm:rounded-[40px] flex flex-col shadow-2xl relative">
         <div class="relative z-10 flex flex-col h-full">
@@ -984,12 +1176,11 @@
     </section>
   </main>
 
-  <!-- FIREBASE AUTH ENGINE -->
+  <!-- FIREBASE AUTH ENGINE[cite: 1] -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-    // Insert your Firebase Project credentials here:
     const firebaseConfig = {
       apiKey: "AIzaSyBMduWaCiRiKvkeyikXYSAWlCuBttK78eI",
       authDomain: "oasis-trips.firebaseapp.com",
@@ -1014,10 +1205,8 @@
       console.warn("Firebase config not loaded yet, running in demo mode.", e);
     }
 
-    // Google Sign-In Trigger
     window.triggerGoogleSignIn = async () => {
       if (!auth) {
-        // Instant Demo Account simulation so you can preview the UI right now!
         simulateSignIn({
           displayName: "Alex Rivera",
           email: "alex.rivera@gmail.com",
@@ -1039,7 +1228,6 @@
       }
     };
 
-    // Email Sign-In
     window.handleEmailSignIn = async (e) => {
       e.preventDefault();
       const email = document.getElementById('auth-email-input').value;
@@ -1091,7 +1279,6 @@
         slot.innerHTML = `<img src="${user.photoURL || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&auto=format&fit=crop&q=80'}" class="w-5 h-5 sm:w-6 sm:h-6 rounded-full border border-cyan-400 object-cover">`;
         dot.classList.remove('hidden');
 
-        // Populate Account Modal
         document.getElementById('account-avatar').src = user.photoURL || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80';
         document.getElementById('account-name').innerText = user.displayName || 'Explorer';
         document.getElementById('account-email').innerText = user.email || 'user@oasis.trips';
@@ -1102,7 +1289,6 @@
       }
     }
 
-    // Auto-restore login on load
     if (auth) {
       onAuthStateChanged(auth, (user) => {
         updateUserUI(user);
@@ -1115,7 +1301,7 @@
     window.isUserLoggedIn = () => Boolean(currentUserState);
   </script>
 
-  <!-- CORE SCRIPT -->
+  <!-- CORE SCRIPT[cite: 1] -->
   <script>
     const OASIS_DESTINATIONS = [
       { name: "Taj Mahal", location: "Agra, Uttar Pradesh", coords: [27.1751, 78.0421], tag: "Heritage", img: "https://images.unsplash.com/photo-1564507592333-c60657eea523?w=600&auto=format&fit=crop&q=80" },
@@ -1124,7 +1310,16 @@
       { name: "Mysore Palace", location: "Mysuru, Karnataka", coords: [12.3051, 76.6551], tag: "Palace", img: "https://images.unsplash.com/photo-1600100397608-f010e42e5df8?w=600&auto=format&fit=crop&q=80" }
     ];
 
+    const NEARBY_PLACES_DATA = [
+      { name: "GreenVolt Supercharger EV", type: "fuel", distance: "0.8 km", rating: "4.9 ★", coords: [28.6139, 77.2090], address: "Sector 12, Terminal Point" },
+      { name: "Blue Tokai Coffee Roasters", type: "cafe", distance: "1.2 km", rating: "4.8 ★", coords: [28.6150, 77.2100], address: "Promenade Boulevard" },
+      { name: "Grand Vista Palace Hotel", type: "hotel", distance: "2.5 km", rating: "4.7 ★", coords: [28.6200, 77.2150], address: "City Center Ring" },
+      { name: "Central Heritage Observatory", type: "sight", distance: "3.1 km", rating: "4.9 ★", coords: [28.6250, 77.2200], address: "Museum District" }
+    ];
+
     let savedTrips = JSON.parse(localStorage.getItem('oasis_saved_trips_mobile')) || [];
+
+    // Original settings state strictly preserved[cite: 1]
     let appSettings = {
       isDarkMode: true,
       mapStyle: 'satellite',
@@ -1133,6 +1328,8 @@
       satelliteHybrid: true,
       highAccuracyGps: true,
       voiceNav: false,
+      incognito: false,
+      anonymizeCoords: false,
       gpsEnabled: false
     };
 
@@ -1158,10 +1355,11 @@
       initMap();
       renderCuratedCards();
       renderSavedList();
+      renderNearbyPOIs('all');
       lucide.createIcons();
     });
 
-    // --- ZERO-KEY TILE & SATELLITE ENGINE ---
+    // --- ZERO-KEY TILE & SATELLITE ENGINE[cite: 1] ---
     function initMap() {
       if (baseMap) return;
 
@@ -1175,7 +1373,13 @@
       setMapBaseLayer('satellite');
 
       baseMap.on('click', (e) => {
-        inspectCoordinatePoint(e.latlng.lat, e.latlng.lng);
+        let lat = e.latlng.lat;
+        let lng = e.latlng.lng;
+        if (appSettings.anonymizeCoords) {
+          lat = parseFloat(lat.toFixed(2));
+          lng = parseFloat(lng.toFixed(2));
+        }
+        inspectCoordinatePoint(lat, lng);
       });
     }
 
@@ -1220,6 +1424,7 @@
       document.getElementById('layer-drawer-panel').classList.add('hidden');
     }
 
+    // Preserved actual toggle methods[cite: 1]
     function toggleSatelliteHybrid(enabled) {
       appSettings.satelliteHybrid = enabled;
       if (appSettings.mapStyle === 'satellite' && satelliteLabelLayer) {
@@ -1241,6 +1446,17 @@
       dispatchToast(enabled ? "Voice Synthesis Enabled" : "Voice Synthesis Disabled");
     }
 
+    function toggleIncognito(enabled) {
+      appSettings.incognito = enabled;
+      document.getElementById('stat-privacy-status').innerText = enabled ? "Incognito" : "Standard";
+      dispatchToast(enabled ? "Incognito Active: Trips will not be logged" : "Incognito Disabled");
+    }
+
+    function toggleAnonymize(enabled) {
+      appSettings.anonymizeCoords = enabled;
+      dispatchToast(enabled ? "Telemetry Masking Enabled" : "Precision GPS Coordinates Active");
+    }
+
     function toggleLayerMenuSelector() {
       document.getElementById('layer-drawer-panel').classList.toggle('hidden');
     }
@@ -1250,12 +1466,12 @@
       delta > 0 ? baseMap.zoomIn() : baseMap.zoomOut();
     }
 
-    // --- CURATED SHOWCASE ---
+    // --- CURATED SHOWCASE[cite: 1] ---
     function renderCuratedCards() {
       const grid = document.getElementById('curated-places-grid');
       grid.innerHTML = OASIS_DESTINATIONS.map((d, idx) => `
         <div onclick="selectCuratedDestination(${idx})" 
-             class="liquid-glass rounded-[20px] sm:rounded-2xl overflow-hidden cursor-pointer group hover:scale-[1.03] transition-all duration-300 shadow-md">
+             class="liquid-glass rounded-[20px] sm:rounded-2xl overflow-hidden cursor-pointer group hover:scale-[1.03] transition-all duration-300 shadow-md active:scale-95">
           <div class="h-20 sm:h-24 w-full relative bg-slate-800 overflow-hidden z-10">
             <img src="${d.img}" alt="${d.name}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
             <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-60"></div>
@@ -1286,7 +1502,7 @@
       baseMap.flyTo(p.coords, 14, { duration: 1.2 });
     }
 
-    // --- REVERSE GEOCODING & PLACE INSPECTOR ---
+    // --- REVERSE GEOCODING & PLACE INSPECTOR[cite: 1] ---
     async function inspectCoordinatePoint(lat, lng) {
       dispatchToast("Resolving location details...");
 
@@ -1379,7 +1595,7 @@
       }
     }
 
-    // --- ACCURATE GPS HARDWARE SENSOR ---
+    // --- ACCURATE GPS HARDWARE SENSOR[cite: 1] ---
     function toggleRealtimeGPSLock() {
       appSettings.gpsEnabled = !appSettings.gpsEnabled;
       const icon = document.getElementById('gps-icon-indicator');
@@ -1402,7 +1618,11 @@
       dispatchToast("Connecting to GPS satellites...");
       gpsWatchId = navigator.geolocation.watchPosition(
         (pos) => {
-          const { latitude, longitude } = pos.coords;
+          let { latitude, longitude } = pos.coords;
+          if (appSettings.anonymizeCoords) {
+            latitude = parseFloat(latitude.toFixed(2));
+            longitude = parseFloat(longitude.toFixed(2));
+          }
           icon.className = "w-4 h-4 sm:w-5 sm:h-5 text-cyan-400 relative z-10";
           const latlng = [latitude, longitude];
 
@@ -1434,7 +1654,11 @@
 
       navigator.geolocation.getCurrentPosition(
         async (pos) => {
-          const { latitude, longitude } = pos.coords;
+          let { latitude, longitude } = pos.coords;
+          if (appSettings.anonymizeCoords) {
+            latitude = parseFloat(latitude.toFixed(2));
+            longitude = parseFloat(longitude.toFixed(2));
+          }
           try {
             const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=14`);
             const data = await res.json();
@@ -1451,7 +1675,7 @@
       );
     }
 
-    // --- AUTOCOMPLETE ENGINE ---
+    // --- AUTOCOMPLETE ENGINE[cite: 1] ---
     function handleSearchAutocomplete(query, suggestBoxId, targetInputId) {
       clearTimeout(autocompleteTimer);
       const container = document.getElementById(suggestBoxId + "-content");
@@ -1504,7 +1728,7 @@
       document.getElementById(suggestId).classList.add('hidden');
     }
 
-    // --- ROUTE NAVIGATION PIPELINE ---
+    // --- ROUTE NAVIGATION PIPELINE[cite: 1] ---
     function setTransportMode(mode) {
       appSettings.transportMode = mode;
       ['drive', 'transit', 'walk'].forEach(m => {
@@ -1539,7 +1763,7 @@
 
       searchCache.origin = orig;
       searchCache.destination = dest;
-      dispatchToast("Plotting optimal route...");
+      dispatchToast("Plotting express route...");
 
       try {
         const [origCoords, destCoords] = await Promise.all([
@@ -1587,14 +1811,13 @@
         updateTelemetryMetrics();
         renderGuidanceDirections(route.legs[0].steps);
 
-        // Voice Navigation Audio synthesis trigger
         if (appSettings.voiceNav && 'speechSynthesis' in window) {
           const firstStep = route.legs[0].steps[0];
-          const utterance = new SpeechSynthesisUtterance(firstStep.maneuver.instruction || `Start navigating towards ${dest}`);
+          const utterance = new SpeechSynthesisUtterance(firstStep.maneuver.instruction || `Start navigating towards destination`);
           window.speechSynthesis.speak(utterance);
         }
 
-        dispatchToast("Route generated successfully");
+        dispatchToast("Express Route Plotted");
       } catch (err) {
         dispatchToast(err.message || "Failed to plot trip");
       }
@@ -1660,7 +1883,50 @@
       calculateTrip();
     }
 
-    // --- MODAL CONTROLS ---
+    // --- NEARBY POI RADAR ENGINE ---
+    function renderNearbyPOIs(filter) {
+      const container = document.getElementById('nearby-cards-container');
+      const filtered = filter === 'all' ? NEARBY_PLACES_DATA : NEARBY_PLACES_DATA.filter(p => p.type === filter);
+
+      container.innerHTML = filtered.map(p => `
+        <div class="glass-input-box p-3.5 sm:p-4 rounded-2xl sm:rounded-3xl flex items-center justify-between hover:bg-black/5 dark:hover:bg-white/5 transition-all">
+          <div class="min-w-0 pr-3">
+            <div class="flex items-center gap-2">
+              <h4 class="font-bold text-xs sm:text-sm text-[var(--text-main)] truncate">${p.name}</h4>
+              <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-400">${p.rating}</span>
+            </div>
+            <p class="text-[10px] sm:text-xs font-medium text-[var(--text-muted)] mt-1 flex items-center gap-1.5">
+              <i data-lucide="map-pin" class="w-3 h-3 text-cyan-400"></i> ${p.address} • <span class="text-cyan-400 font-bold">${p.distance} away</span>
+            </p>
+          </div>
+          <button onclick="routeDirectlyToPOI('${p.name}', ${p.coords[0]}, ${p.coords[1]})"
+            class="liquid-button py-2 px-3.5 rounded-xl text-xs font-bold text-white shrink-0 flex items-center gap-1.5 active:scale-95">
+            <i data-lucide="navigation-2" class="w-3.5 h-3.5 fill-white"></i> Route
+          </button>
+        </div>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function filterNearbyPOIs(type) {
+      document.querySelectorAll('.nearby-filter-btn').forEach(btn => {
+        btn.className = "nearby-filter-btn px-3 py-1.5 rounded-xl text-xs font-medium text-[var(--text-muted)] hover:text-[var(--text-main)] shrink-0 transition-all";
+      });
+      event.target.className = "nearby-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold bg-black/10 dark:bg-white/15 text-cyan-400 shrink-0 transition-all";
+      renderNearbyPOIs(type);
+    }
+
+    function routeDirectlyToPOI(name, lat, lng) {
+      document.getElementById('route-destination').value = `${name} (${lat}, ${lng})`;
+      navigateTo('plan');
+      if (document.getElementById('route-origin').value) {
+        calculateTrip();
+      } else {
+        loadMyCurrentGPSLocation('route-origin');
+      }
+    }
+
+    // --- MODAL CONTROLS WITH ANIMATIONS[cite: 1] ---
     function openAuthOrAccount() {
       if (window.isUserLoggedIn && window.isUserLoggedIn()) {
         openAccountModal();
@@ -1672,11 +1938,14 @@
     function openAuthModal() {
       const modal = document.getElementById('signin-modal');
       const content = document.getElementById('signin-content');
-      modal.classList.remove('hidden');
+      modal.classList.remove('hidden', 'pointer-events-none');
       modal.classList.add('flex');
-      void modal.offsetWidth;
-      content.classList.remove('scale-95', 'opacity-0');
-      content.classList.add('scale-100', 'opacity-100');
+      requestAnimationFrame(() => {
+        modal.classList.remove('opacity-0');
+        modal.classList.add('opacity-100');
+        content.classList.remove('scale-95', 'opacity-0');
+        content.classList.add('scale-100', 'opacity-100');
+      });
     }
 
     function closeAuthModal() {
@@ -1684,10 +1953,12 @@
       const content = document.getElementById('signin-content');
       content.classList.remove('scale-100', 'opacity-100');
       content.classList.add('scale-95', 'opacity-0');
+      modal.classList.remove('opacity-100');
+      modal.classList.add('opacity-0', 'pointer-events-none');
       setTimeout(() => {
         modal.classList.add('hidden');
         modal.classList.remove('flex');
-      }, 250);
+      }, 280);
     }
 
     function continueAsGuest() {
@@ -1699,11 +1970,14 @@
       const modal = document.getElementById('account-modal');
       const content = document.getElementById('account-content');
       document.getElementById('account-saved-count').innerText = savedTrips.length;
-      modal.classList.remove('hidden');
+      modal.classList.remove('hidden', 'pointer-events-none');
       modal.classList.add('flex');
-      void modal.offsetWidth;
-      content.classList.remove('scale-95', 'opacity-0');
-      content.classList.add('scale-100', 'opacity-100');
+      requestAnimationFrame(() => {
+        modal.classList.remove('opacity-0');
+        modal.classList.add('opacity-100');
+        content.classList.remove('scale-95', 'opacity-0');
+        content.classList.add('scale-100', 'opacity-100');
+      });
     }
 
     function closeAccountModal() {
@@ -1711,10 +1985,12 @@
       const content = document.getElementById('account-content');
       content.classList.remove('scale-100', 'opacity-100');
       content.classList.add('scale-95', 'opacity-0');
+      modal.classList.remove('opacity-100');
+      modal.classList.add('opacity-0', 'pointer-events-none');
       setTimeout(() => {
         modal.classList.add('hidden');
         modal.classList.remove('flex');
-      }, 250);
+      }, 280);
     }
 
     function toggleSettingsModal() {
@@ -1722,18 +1998,57 @@
       const content = document.getElementById('settings-content');
 
       if (modal.classList.contains('hidden')) {
-        modal.classList.remove('hidden');
+        modal.classList.remove('hidden', 'pointer-events-none');
         modal.classList.add('flex');
-        void modal.offsetWidth;
-        content.classList.remove('scale-95', 'opacity-0');
-        content.classList.add('scale-100', 'opacity-100');
+        requestAnimationFrame(() => {
+          modal.classList.remove('opacity-0');
+          modal.classList.add('opacity-100');
+          content.classList.remove('scale-95', 'opacity-0');
+          content.classList.add('scale-100', 'opacity-100');
+        });
       } else {
         content.classList.remove('scale-100', 'opacity-100');
         content.classList.add('scale-95', 'opacity-0');
+        modal.classList.remove('opacity-100');
+        modal.classList.add('opacity-0', 'pointer-events-none');
         setTimeout(() => {
           modal.classList.add('hidden');
           modal.classList.remove('flex');
-        }, 250);
+        }, 280);
+      }
+    }
+
+    function switchSettingsTab(tab) {
+      const genSec = document.getElementById('section-settings-general');
+      const privSec = document.getElementById('section-settings-privacy');
+      const genBtn = document.getElementById('set-tab-general');
+      const privBtn = document.getElementById('set-tab-privacy');
+
+      if (tab === 'general') {
+        genSec.classList.remove('hidden');
+        privSec.classList.add('hidden');
+        genBtn.className = "flex-1 py-1.5 text-xs font-bold rounded-xl bg-black/10 dark:bg-white/15 text-cyan-400 shadow-sm transition-all duration-200";
+        privBtn.className = "flex-1 py-1.5 text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--text-main)] transition-all duration-200";
+      } else {
+        privSec.classList.remove('hidden');
+        genSec.classList.add('hidden');
+        privBtn.className = "flex-1 py-1.5 text-xs font-bold rounded-xl bg-black/10 dark:bg-white/15 text-cyan-400 shadow-sm transition-all duration-200";
+        genBtn.className = "flex-1 py-1.5 text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--text-main)] transition-all duration-200";
+      }
+      lucide.createIcons();
+    }
+
+    function clearSearchHistoryCache() {
+      searchCache = { origin: '', destination: '' };
+      dispatchToast("Search Cache Cleared");
+    }
+
+    function wipeAllUserData() {
+      if (confirm("Are you sure you want to remove all saved expeditions?")) {
+        savedTrips = [];
+        localStorage.removeItem('oasis_saved_trips_mobile');
+        renderSavedList();
+        dispatchToast("All saved trips deleted");
       }
     }
 
@@ -1746,22 +2061,26 @@
       }
     }
 
+    // Units setting handler[cite: 1]
     function setUnits(unit) {
       appSettings.units = unit;
       const kmBtn = document.getElementById('unit-km-btn');
       const miBtn = document.getElementById('unit-mi-btn');
       if (unit === 'km') {
-        kmBtn.className = "px-3.5 py-1 rounded-lg text-xs font-bold bg-[var(--brand-blue)] text-white shadow-sm";
-        miBtn.className = "px-3.5 py-1 rounded-lg text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--text-main)]";
+        kmBtn.className = "px-3.5 py-1 rounded-lg text-xs font-bold bg-[var(--brand-blue)] text-white shadow-sm transition-all duration-200";
+        miBtn.className = "px-3.5 py-1 rounded-lg text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--text-main)] transition-all duration-200";
       } else {
-        miBtn.className = "px-3.5 py-1 rounded-lg text-xs font-bold bg-[var(--brand-blue)] text-white shadow-sm";
-        kmBtn.className = "px-3.5 py-1 rounded-lg text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--text-main)]";
+        miBtn.className = "px-3.5 py-1 rounded-lg text-xs font-bold bg-[var(--brand-blue)] text-white shadow-sm transition-all duration-200";
+        kmBtn.className = "px-3.5 py-1 rounded-lg text-xs font-semibold text-[var(--text-muted)] hover:text-[var(--text-main)] transition-all duration-200";
       }
       if (currentDistanceKm > 0) updateTelemetryMetrics();
     }
 
-    // --- BOOKMARKS LOCAL & CLOUD STORAGE ---
+    // --- BOOKMARKS LOCAL & CLOUD STORAGE[cite: 1] ---
     function saveItineraryToArchive() {
+      if (appSettings.incognito) {
+        return dispatchToast("Incognito active: Route will not be cached");
+      }
       if (!searchCache.origin || !searchCache.destination) return;
       savedTrips.unshift({
         id: Date.now(),
@@ -1793,7 +2112,7 @@
               </p>
             </div>
             <button onclick="quickRoute('${item.origin.replace(/'/g, "\\'")}', '${item.destination.replace(/'/g, "\\'")}')"
-              class="p-2 sm:p-3 rounded-[14px] sm:rounded-2xl bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 hover:scale-105 transition-all border border-cyan-500/20">
+              class="p-2 sm:p-3 rounded-[14px] sm:rounded-2xl bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 hover:scale-105 transition-all border border-cyan-500/20 active:scale-95">
               <i data-lucide="arrow-up-right" class="w-4 h-4 sm:w-5 sm:h-5"></i>
             </button>
           </div>
@@ -1809,9 +2128,10 @@
       calculateTrip();
     }
 
-    // --- NAVIGATION & VIEWS ---
+    // --- NAVIGATION & VIEWS[cite: 1] ---
     function navigateTo(view) {
-      ['home', 'plan', 'saved'].forEach(v => {
+      const allViews = ['home', 'plan', 'nearby', 'insights', 'saved'];
+      allViews.forEach(v => {
         const el = document.getElementById(`view-${v}`);
         const btn = document.getElementById(`nav-btn-${v}`);
         if (v === view) {
